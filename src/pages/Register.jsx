@@ -24,7 +24,7 @@ export default function Register() {
         allergies: formData.allergies,
         fitnessGoals: formData.fitnessGoals
       });
-      navigate('/');
+      navigate('/dashboard');
     } catch (error) {
       setError('Failed to create an account');
     }
