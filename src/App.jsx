@@ -10,6 +10,7 @@ import MealPlanner from './pages/MealPlanner';
 import Recipes from './pages/Recipes';
 import ProtectedRoute from './pages/ProtectedRoute';
 import NutritionTracker from './pages/NutritionTracker';
+import Homepage from './pages/Homepage';
 
 function App() {
   return (
@@ -21,6 +22,8 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/home" element={<Homepage />} />
+
               <Route path="/" element={
                 <ProtectedRoute>
                   <Dashboard />
