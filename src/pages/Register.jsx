@@ -4,6 +4,7 @@ import { useAuth } from '../Auth/AuthContext';
 
 export default function Register() {
   const [formData, setFormData] = useState({
+    username: '',
     email: '',
     password: '',
     dietaryPreferences: [],
@@ -18,6 +19,7 @@ export default function Register() {
     e.preventDefault();
     try {
       await register(formData.email, formData.password, {
+        username: formData.username,
         dietaryPreferences: formData.dietaryPreferences,
         allergies: formData.allergies,
         fitnessGoals: formData.fitnessGoals
@@ -33,6 +35,18 @@ export default function Register() {
       <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <h2 className="text-2xl mb-6 text-center font-bold">Register</h2>
         {error && <div className="mb-4 text-red-500 text-center">{error}</div>}
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Username
+          </label>
+          <input
+            type="text"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            value={formData.username}
+            onChange={(e) => setFormData({...formData, username: e.target.value})}
+            required
+          />
+        </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Email
