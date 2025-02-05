@@ -1,10 +1,21 @@
 import React from 'react';
 import { useAuth } from '../Auth/AuthContext';
 import { Link } from 'react-router-dom';
+import { Menu, Search, Bell, User, Calendar, BookOpen, BarChart2, Heart, ChevronRight, Star, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+
 
 
 export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState('all');
+
   const { user } = useAuth();
+  const popularRecipes = [
+    { id: 1, name: 'Quinoa Buddha Bowl', category: 'lunch', rating: 4.8, calories: 450, time: '25 min' },
+    { id: 2, name: 'Berry Smoothie Bowl', category: 'breakfast', rating: 4.9, calories: 320, time: '10 min' },
+    { id: 3, name: 'Grilled Salmon Salad', category: 'dinner', rating: 4.7, calories: 520, time: '30 min' }
+  ];
+
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -23,6 +34,11 @@ export default function Dashboard() {
           </div>
         </Link>
       </div>
+
+      
+
+
     </div>
   );
 }
+
