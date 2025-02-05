@@ -220,5 +220,3 @@ const featuresData = [
     ]
   },
 ];
-
-// Additional features can be added similarly...
