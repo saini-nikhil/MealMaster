@@ -2,20 +2,20 @@ import React from "react";
 import { motion } from "framer-motion";
 import { BrainCircuit, Dumbbell, Users, CheckCircle, Quote } from "lucide-react"; // Importing icons
 
-//Hero image URL (from your GitHub)
+// ✅ Hero image URL (from your GitHub)
 const heroImageUrl = "https://raw.githubusercontent.com/saini-nikhil/MealMaster/main/src/assets/Meal%20Master%20Hero%20Image.svg";
 
-// Feature images
+// ✅ Feature images
 const featureImages = {
   aiMeal: "https://raw.githubusercontent.com/saini-nikhil/MealMaster/main/src/assets/Meal%20Master%20AI%20Meal.svg",
-  calorie: "https://raw.githubusercontent.com/saini-nikhil/MealMaster/main/src/assets/Meal%20Master%20Calories.svg",
+  calorie: "https://raw.githubusercontent.com/saini-nikhil/MealMaster/refs/heads/main/src/assets/Meal%20Master%20Calories.svg",
   community: "https://raw.githubusercontent.com/saini-nikhil/MealMaster/main/src/assets/Meal%20Master%20Community%20Recipes.svg",
   groceryList: "https://raw.githubusercontent.com/saini-nikhil/MealMaster/main/src/assets/Meal%20Master%20Grocery%20List.svg",
   prepReminder: "https://raw.githubusercontent.com/saini-nikhil/MealMaster/main/src/assets/Meal%20Master%20Prep%20Reminder.svg",
   nutritionalAnalysis: "https://raw.githubusercontent.com/saini-nikhil/MealMaster/refs/heads/main/src/assets/Meal%20Master%20Calories.svg"
 };
 
-
+// ✅ Dummy user reviews
 const reviews = [
   { name: "John Doe", text: "“MealMaster changed my life!”", img: "https://randomuser.me/api/portraits/men/45.jpg" },
   { name: "Jane Smith", text: "“AI meal planning saves me so much time!”", img: "https://randomuser.me/api/portraits/women/65.jpg" },
@@ -28,7 +28,7 @@ export default function Homepage() {
   return (
     <div className="bg-white min-h-screen mx-0"> {/* Ensuring white background */}
       
-      {/* HERO SECTION */}
+      {/* ✅ HERO SECTION */}
       <section className="relative flex flex-col-reverse md:flex-row items-center justify-between px-6 py-20">
         <motion.div
           className="md:w-1/2 text-center md:text-left"
@@ -66,12 +66,12 @@ export default function Homepage() {
         </motion.div>
       </section>
 
-      {/* ADDITIONAL FEATURES SECTION */}
+      {/* ✅ ADDITIONAL FEATURES SECTION */}
       {featuresData.map((feature, index) => (
-        <section key={index} className={`relative flex ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'} items-center justify-between px-6 py-8`}>
+        <section key={index} className={`relative flex flex-col md:flex-row items-center justify-between px-6 py-8`}>
           
           <motion.div
-            className="md:w-1/2 flex justify-center"
+            className="md:w-1/2 flex justify-center mb-4 md:mb-0"
             initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1 }}
@@ -79,7 +79,7 @@ export default function Homepage() {
             <img
               src={feature.img}
               alt={feature.title}
-              className="w-full md:w-4/5"
+              className="w-full h-auto max-w-xs md:max-w-md" // Ensuring responsiveness
             />
           </motion.div>
 
@@ -95,7 +95,7 @@ export default function Homepage() {
             </h2>
             <p className="mt-4 text-lg text-gray-700">{feature.description}</p>
             {feature.bullets && (
-              <ul className="mt-2 list-disc list-inside text-gray-600">
+              <ul className="mt-2 list-none text-gray-600">
                 {feature.bullets.map((bullet, bulletIndex) => (
                   <li key={bulletIndex} className="flex items-center">
                     <CheckCircle className="text-green-600 mr-2" /> {/* Check icon */}
@@ -108,7 +108,7 @@ export default function Homepage() {
         </section>
       ))}
 
-      {/* USER REVIEWS */}
+      {/* ✅ USER REVIEWS */}
       <section className="max-w-6xl mx-auto py-16 px-6">
         <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">What Our Users Say</h2>
         <div className="grid md:grid-cols-3 gap-8 mt-8">
@@ -129,18 +129,30 @@ export default function Homepage() {
         </div>
       </section>
 
-      {/*OVERALL BENEFITS SECTION */}
+      {/* ✅ OVERALL BENEFITS SECTION */}
       <section className="bg-green-100 py-16">
         <div className="max-w-xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-gray-900">Experience the Benefits of MealMaster</h2>
           <p className="mt-4 text-lg text-gray-700">
             MealMaster not only simplifies meal planning but also enhances your overall cooking experience:
           </p>
-          <ul className="mt-6 list-disc list-inside text-left mx-auto max-w-md">
-            <li>✔️ Save time with effortless meal planning.</li>
-            <li>✔️ Enjoy personalized meal suggestions.</li>
-            <li>✔️ Track your nutritional intake easily.</li>
-            <li>✔️ Connect with a vibrant community of food lovers.</li>
+          <ul className="mt-6 list-none mx-auto max-w-md">
+            <li className="flex items-center justify-start mb-2">
+              <CheckCircle className="text-green-600 mr-2" /> 
+              Save time with effortless meal planning.
+            </li>
+            <li className="flex items-center justify-start mb-2">
+              <CheckCircle className="text-green-600 mr-2" /> 
+              Enjoy personalized meal suggestions.
+            </li>
+            <li className="flex items-center justify-start mb-2">
+              <CheckCircle className="text-green-600 mr-2" /> 
+              Track your nutritional intake easily.
+            </li>
+            <li className="flex items-center justify-start mb-2">
+              <CheckCircle className="text-green-600 mr-2" /> 
+              Connect with a vibrant community of food lovers.
+            </li>
           </ul>
           <motion.button
             className="mt-8 px-6 py-3 bg-green-600 text-white font-bold rounded-lg shadow-lg hover:bg-green-700 transition"
@@ -208,3 +220,5 @@ const featuresData = [
     ]
   },
 ];
+
+// Additional features can be added similarly...
