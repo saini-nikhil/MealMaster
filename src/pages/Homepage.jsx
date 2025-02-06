@@ -28,7 +28,7 @@ const featuresData = [
   {
     title: "Meal Plan Creation",
     description: "Easily create weekly meal plans tailored to your dietary preferences.",
-    img: featureImages.groceryList,
+    img: featureImages.aiMeal,
     icon: <Dumbbell />,
     bullets: [
       "Select recipes from our extensive database.",
