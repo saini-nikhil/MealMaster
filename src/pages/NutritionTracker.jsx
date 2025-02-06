@@ -8,7 +8,8 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { PlusCircle, Trash2, Search } from "lucide-react";
+import { PlusCircle, Trash2 } from "lucide-react";
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function NutritionTracker() {
   const { user } = useAuth();
@@ -27,6 +28,7 @@ export default function NutritionTracker() {
   const [totalFat, setTotalFat] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     if (user) {
@@ -46,7 +48,6 @@ export default function NutritionTracker() {
         meals.push({ id: docSnap.id, ...docSnap.data() });
       });
 
-      // Filter meals based on search
       let filteredMeals = meals;
       if (search) {
         filteredMeals = meals.filter((meal) =>
@@ -54,10 +55,8 @@ export default function NutritionTracker() {
         );
       }
 
-      // Update logged meals
       setLoggedMeals(filteredMeals);
 
-      // Update nutritional summary
       let calories = 0;
       let carbs = 0;
       let protein = 0;
@@ -110,7 +109,7 @@ export default function NutritionTracker() {
         userId: user.uid,
         ...meal,
       });
-      fetchLoggedMeals(); // Refresh meal list after adding a new one
+      fetchLoggedMeals();
     } catch (error) {
       console.error("Error adding meal:", error);
     }
@@ -120,23 +119,22 @@ export default function NutritionTracker() {
     try {
       const mealDoc = doc(db, "nutritionTracker", mealId);
       await deleteDoc(mealDoc);
-      fetchLoggedMeals(); // Refresh meal list after deletion
+      fetchLoggedMeals();
     } catch (error) {
       console.error("Error deleting meal:", error);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Nutrition Tracker Form */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+        <div className={`rounded-xl shadow-md p-6 mb-8 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
           <h2 className="text-2xl font-bold mb-6">Log Your Meals</h2>
           <div className="space-y-4">
             <input
               type="text"
               placeholder="Meal Name"
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className={`w-full p-3 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'} rounded-lg focus:ring-2 focus:ring-blue-500`}
               value={newMeal.name}
               onChange={(e) =>
                 setNewMeal({ ...newMeal, name: e.target.value })
@@ -145,7 +143,7 @@ export default function NutritionTracker() {
             <input
               type="number"
               placeholder="Calories"
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className={`w-full p-3 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'} rounded-lg focus:ring-2 focus:ring-blue-500`}
               value={newMeal.calories}
               onChange={(e) =>
                 setNewMeal({ ...newMeal, calories: e.target.value })
@@ -154,7 +152,7 @@ export default function NutritionTracker() {
             <input
               type="number"
               placeholder="Carbs (g)"
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className={`w-full p-3 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'} rounded-lg focus:ring-2 focus:ring-blue-500`}
               value={newMeal.carbs}
               onChange={(e) =>
                 setNewMeal({ ...newMeal, carbs: e.target.value })
@@ -163,7 +161,7 @@ export default function NutritionTracker() {
             <input
               type="number"
               placeholder="Protein (g)"
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className={`w-full p-3 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'} rounded-lg focus:ring-2 focus:ring-blue-500`}
               value={newMeal.protein}
               onChange={(e) =>
                 setNewMeal({ ...newMeal, protein: e.target.value })
@@ -172,7 +170,7 @@ export default function NutritionTracker() {
             <input
               type="number"
               placeholder="Fat (g)"
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className={`w-full p-3 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'} rounded-lg focus:ring-2 focus:ring-blue-500`}
               value={newMeal.fat}
               onChange={(e) =>
                 setNewMeal({ ...newMeal, fat: e.target.value })
@@ -187,28 +185,26 @@ export default function NutritionTracker() {
           </div>
         </div>
 
-        {/* Loading and Error States */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           </div>
         ) : hasError ? (
-          <div className="text-center text-red-500 py-12 bg-red-50 rounded-lg">
+          <div className={`text-center py-12 ${darkMode ? 'bg-red-900 text-red-300' : 'bg-red-50 text-red-500'} rounded-lg`}>
             <p className="text-lg font-medium">Error fetching meals</p>
             <p className="text-sm mt-2">Please try again later</p>
           </div>
         ) : (
           <>
-            {/* Meals List */}
             <div className="space-y-6">
               {loggedMeals.map((meal) => (
                 <div
                   key={meal.id}
-                  className="bg-white rounded-xl shadow-md p-6 flex justify-between items-center"
+                  className={`flex justify-between items-center rounded-xl shadow-md p-6 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}
                 >
                   <div>
-                    <h3 className="text-xl font-bold">{meal.name}</h3>
-                    <p className="text-sm text-gray-600">{meal.calories} Calories</p>
+                    <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>{meal.name}</h3>
+                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{meal.calories} Calories</p>
                   </div>
                   <div>
                     <button
@@ -222,25 +218,24 @@ export default function NutritionTracker() {
               ))}
             </div>
 
-            {/* Nutritional Summary */}
-            <div className="mt-8 bg-white p-6 rounded-xl shadow-md">
+            <div className={`mt-8 rounded-xl shadow-md p-6 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
               <h3 className="text-xl font-bold">Daily Nutritional Summary</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
                 <div className="text-center">
-                  <p className="text-sm text-gray-600">Calories</p>
-                  <p className="text-lg font-bold">{totalCalories} kcal</p>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Calories</p>
+                  <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-black'}`}>{totalCalories} kcal</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm text-gray-600">Carbs</p>
-                  <p className="text-lg font-bold">{totalCarbs} g</p>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Carbs</p>
+                  <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-black'}`}>{totalCarbs} g</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm text-gray-600">Protein</p>
-                  <p className="text-lg font-bold">{totalProtein} g</p>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Protein</p>
+                  <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-black'}`}>{totalProtein} g</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm text-gray-600">Fat</p>
-                  <p className="text-lg font-bold">{totalFat} g</p>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Fat</p>
+                  <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-black'}`}>{totalFat} g</p>
                 </div>
               </div>
             </div>

@@ -1,21 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Auth/AuthContext";
-import { Loader2, Mail, Lock } from "lucide-react"; // Import Lucide Icons
+import { Loader2, Mail, Lock } from "lucide-react";
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
+  const { darkMode } = useTheme();
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Handle login
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (loading) return; // Prevent multiple clicks
+    if (loading) return;
 
     setError("");
     setLoading(true);
@@ -33,14 +34,14 @@ export default function Login() {
       } else {
         setError("Failed to log in. Please try again.");
       }
-      setLoading(false); // Reset loading only on failure
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+    <div className={`flex items-center justify-center min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
+      <div className={`max-w-md w-full ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-8`}>
+        <h2 className={`text-2xl font-bold mb-6 text-center ${darkMode ? 'text-white' : 'text-gray-800'}`}>
           Login
         </h2>
 
@@ -51,42 +52,39 @@ export default function Login() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email Field */}
-          <div className="flex items-center border rounded px-3 py-2">
-            <Mail className="text-gray-500 mr-2" size={18} />
+          <div className={`flex items-center border rounded px-3 py-2 ${darkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300'}`}>
+            <Mail className={`${darkMode ? 'text-gray-400' : 'text-gray-500'} mr-2`} size={18} />
             <input
               type="email"
               id="email"
               placeholder="Email"
-              className="w-full outline-none"
+              className={`w-full outline-none ${darkMode ? 'bg-gray-700 text-white placeholder-gray-400' : 'bg-white text-gray-900 placeholder-gray-500'}`}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              disabled={loading} // Disable input while loading
+              disabled={loading}
             />
           </div>
 
-          {/* Password Field */}
-          <div className="flex items-center border rounded px-3 py-2">
-            <Lock className="text-gray-500 mr-2" size={18} />
+          <div className={`flex items-center border rounded px-3 py-2 ${darkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300'}`}>
+            <Lock className={`${darkMode ? 'text-gray-400' : 'text-gray-500'} mr-2`} size={18} />
             <input
               type="password"
               id="password"
               placeholder="Password"
-              className="w-full outline-none"
+              className={`w-full outline-none ${darkMode ? 'bg-gray-700 text-white placeholder-gray-400' : 'bg-white text-gray-900 placeholder-gray-500'}`}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              disabled={loading} // Disable input while loading
+              disabled={loading}
             />
           </div>
 
-          {/* Submit Button with Loading */}
           <div className="flex justify-center">
             <button
               type="submit"
               className="w-full flex items-center justify-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
-              disabled={loading} // Disable button when loading
+              disabled={loading}
             >
               {loading ? (
                 <>

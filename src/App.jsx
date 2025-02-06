@@ -1,7 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './Auth/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Navbar from './pages/Navbar';
+import Footer from './pages/Footer';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -16,10 +18,10 @@ import FavRecipes from './pages/MyFavRecipes';
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <div className="min-h-screen bg-gray-50">
-          <Navbar/>
-          <div className="container mx-auto px-4 py-8">
+      <ThemeProvider>
+        <BrowserRouter>
+          <Navbar />
+          <div className="container mx-auto px-4 py-8 min-h-[80vh]">
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
@@ -57,8 +59,9 @@ function App() {
               } />
             </Routes>
           </div>
-        </div>
-      </BrowserRouter>
+          <Footer />
+        </BrowserRouter>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

@@ -1,14 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import { BrainCircuit, Dumbbell, Users, CheckCircle, Quote } from "lucide-react"; // Importing icons
+import { BrainCircuit, Dumbbell, Users, CheckCircle, Quote } from "lucide-react";
 import { useAuth } from "../Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useTheme } from '../contexts/ThemeContext';
 
-// ✅ Hero image URL (from your GitHub)
 const heroImageUrl = "https://raw.githubusercontent.com/saini-nikhil/MealMaster/main/src/assets/Meal%20Master%20Hero%20Image.svg";
 
-// ✅ Feature images
 const featureImages = {
   aiMeal: "https://raw.githubusercontent.com/saini-nikhil/MealMaster/main/src/assets/Meal%20Master%20AI%20Meal.svg",
   calorie: "https://raw.githubusercontent.com/saini-nikhil/MealMaster/refs/heads/main/src/assets/Meal%20Master%20Calories.svg",
@@ -18,18 +16,67 @@ const featureImages = {
   nutritionalAnalysis: "https://raw.githubusercontent.com/saini-nikhil/MealMaster/refs/heads/main/src/assets/Meal%20Master%20Calories.svg"
 };
 
-// ✅ Dummy user reviews
 const reviews = [
-  { name: "John Doe", text: "“MealMaster changed my life!”", img: "https://randomuser.me/api/portraits/men/45.jpg" },
-  { name: "Jane Smith", text: "“AI meal planning saves me so much time!”", img: "https://randomuser.me/api/portraits/women/65.jpg" },
-  { name: "Chris Johnson", text: "“The calorie tracking is super useful!”", img: "https://randomuser.me/api/portraits/men/32.jpg" },
-  { name: "Emily Davis", text: "“I love the community recipes!”", img: "https://randomuser.me/api/portraits/women/50.jpg" },
-  { name: "Michael Brown", text: "“The grocery list generator is a game changer!”", img: "https://randomuser.me/api/portraits/men/30.jpg" }
+  { name: "John Doe", text: '"MealMaster changed my life!"', img: "https://randomuser.me/api/portraits/men/45.jpg" },
+  { name: "Jane Smith", text: '"AI meal planning saves me so much time!"', img: "https://randomuser.me/api/portraits/women/65.jpg" },
+  { name: "Chris Johnson", text: '"The calorie tracking is super useful!"', img: "https://randomuser.me/api/portraits/men/32.jpg" },
+  { name: "Emily Davis", text: '"I love the community recipes!"', img: "https://randomuser.me/api/portraits/women/50.jpg" },
+  { name: "Michael Brown", text: '"The grocery list generator is a game changer!"', img: "https://randomuser.me/api/portraits/men/30.jpg" }
+];
+
+const featuresData = [
+  {
+    title: "Meal Plan Creation",
+    description: "Easily create weekly meal plans tailored to your dietary preferences.",
+    img: featureImages.groceryList,
+    icon: <Dumbbell />,
+    bullets: [
+      "Select recipes from our extensive database.",
+      "Input your own recipes for personalized planning.",
+      "Drag and drop meals into a calendar view for convenience.",
+    ],
+  },
+  {
+    title: "Nutritional Tracking",
+    description: "Keep track of your daily nutrition effortlessly.",
+    img: featureImages.nutritionalAnalysis,
+    icon: <BrainCircuit />,
+    bullets: [
+      "Log meals manually or search our recipe database.",
+      "Get insights into your macro and micronutrient intake.",
+      "Monitor your progress towards nutritional goals.",
+    ],
+    alwaysBlack: true,
+  },
+  {
+    title: "Grocery List Generator",
+    description: "Automatically generate a grocery list based on your meal plan.",
+    img: featureImages.groceryList,
+    icon: <Users />,
+    bullets: [
+      "Save time by organizing shopping lists by category.",
+      "Check off items as you shop for a seamless experience.",
+      "Adjust quantities based on your needs.",
+    ],
+  },
+  {
+    title: "Meal Prep Reminders",
+    description: "Stay organized with reminders for meal prep times.",
+    img: featureImages.prepReminder,
+    icon: <Users />,
+    bullets: [
+      "Set reminders for specific meals or prep times.",
+      "Adjust reminders based on your schedule.",
+      "Never forget a meal prep again!",
+    ],
+    alwaysBlack: true,
+  },
 ];
 
 export default function Homepage() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -38,12 +85,12 @@ export default function Homepage() {
   }, [user, navigate, isLoading]);
 
   if (isLoading) {
-    return <div>Loading...</div>; // Or a more sophisticated loading indicator
+    return <div>Loading...</div>;
   }
+
   return (
-    <div className="bg-white min-h-screen mx-0"> {/* Ensuring white background */}
-      
-      {/* ✅ HERO SECTION */}
+    <div className={`${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} min-h-screen mx-0`}>
+
       <section className="relative flex flex-col-reverse md:flex-row items-center justify-between px-6 py-20">
         <motion.div
           className="md:w-1/2 text-center md:text-left"
@@ -51,10 +98,10 @@ export default function Homepage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1 }}
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+          <h1 className={`text-4xl md:text-5xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
             Ready to Simplify Your Mealtime with AI?
           </h1>
-          <p className="mt-4 text-lg text-gray-700">
+          <p className={`mt-4 text-lg ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
             Join Meal Master to revolutionize your cooking experience with AI-powered meal planning.
           </p>
           <motion.button
@@ -81,12 +128,15 @@ export default function Homepage() {
         </motion.div>
       </section>
 
-      {/* ✅ ADDITIONAL FEATURES SECTION */}
       {featuresData.map((feature, index) => (
-        <section key={index} className={`relative flex flex-col md:flex-row items-center justify-between px-6 py-8`}>
-          
+        <section
+          key={index}
+          className={`relative flex flex-col md:flex-row items-center justify-between px-6 py-8 ${
+            index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+          } ${darkMode ? (index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900') : ''}`}
+        >
           <motion.div
-            className="md:w-1/2 flex justify-center mb-4 md:mb-0"
+            className={`md:w-1/2 flex justify-center mb-4 md:mb-0 ${index % 2 !== 0 ? 'order-first md:order-last' : ''}`}
             initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1 }}
@@ -94,7 +144,7 @@ export default function Homepage() {
             <img
               src={feature.img}
               alt={feature.title}
-              className="w-full h-auto max-w-xs md:max-w-md" // Ensuring responsiveness
+              className="w-full h-auto max-w-xs md:max-w-md"
             />
           </motion.div>
 
@@ -104,16 +154,21 @@ export default function Homepage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1 }}
           >
-            <h2 className="text-3xl font-bold text-gray-900 flex items-center">
-              {feature.icon} {/* Render icon */}
+            <h2 className={`text-3xl font-bold ${feature.alwaysBlack ? 'text-gray-900' : darkMode ? 'text-white' : 'text-gray-900'} flex items-center`}>
+              {feature.icon}
               <span className="ml-2">{feature.title}</span>
             </h2>
-            <p className="mt-4 text-lg text-gray-700">{feature.description}</p>
+            <p className={`mt-4 text-lg ${feature.alwaysBlack ? 'text-gray-700' : darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              {feature.description}
+            </p>
             {feature.bullets && (
-              <ul className="mt-2 list-none text-gray-600">
+              <ul className="mt-2 list-none">
                 {feature.bullets.map((bullet, bulletIndex) => (
-                  <li key={bulletIndex} className="flex items-center">
-                    <CheckCircle className="text-green-600 mr-2" /> {/* Check icon */}
+                  <li
+                    key={bulletIndex}
+                    className={`flex items-center ${feature.alwaysBlack ? 'text-gray-600' : darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                  >
+                    <CheckCircle className="text-green-600 mr-2" />
                     {bullet}
                   </li>
                 ))}
@@ -123,49 +178,53 @@ export default function Homepage() {
         </section>
       ))}
 
-      {/* ✅ USER REVIEWS */}
       <section className="max-w-6xl mx-auto py-16 px-6">
-        <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">What Our Users Say</h2>
+        <h2 className={`text-3xl font-bold text-center ${darkMode ? 'text-white' : 'text-gray-900'} mb-8`}>What Our Users Say</h2>
         <div className="grid md:grid-cols-3 gap-8 mt-8">
           {reviews.map((review, index) => (
             <motion.div
               key={index}
-              className="p-6 text-center rounded-lg shadow-lg bg-gray-50 hover:bg-gray-100 transition transform hover:-translate-y-1"
+              className={`p-6 text-center rounded-lg shadow-lg ${
+                darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
+              } transition transform hover:-translate-y-1`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: index * 0.2 }}
             >
-              <img src={review.img} alt={review.name} className="w-16 h-16 rounded-full mx-auto mb-4 border border-gray-200 shadow-md" />
-              <Quote className="text-gray-400 mb-2" /> {/* Quote icon */}
-              <h3 className="font-bold text-gray-900">{review.name}</h3>
-              <p className="text-gray-600 mt-2 italic">{review.text}</p>
+              <img
+                src={review.img}
+                alt={review.name}
+                className="w-16 h-16 rounded-full mx-auto mb-4 border border-gray-200 shadow-md"
+              />
+              <Quote className="text-gray-400 mb-2" />
+              <h3 className={`font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>{review.name}</h3>
+              <p className={`mt-2 italic ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{review.text}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* ✅ OVERALL BENEFITS SECTION */}
-      <section className="bg-green-100 py-16">
+      <section className={`${darkMode ? 'bg-gray-800' : 'bg-green-100'} py-16`}>
         <div className="max-w-xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-gray-900">Experience the Benefits of MealMaster</h2>
-          <p className="mt-4 text-lg text-gray-700">
+          <h2 className={`text-4xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Experience the Benefits of MealMaster</h2>
+          <p className={`mt-4 text-lg ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
             MealMaster not only simplifies meal planning but also enhances your overall cooking experience:
           </p>
           <ul className="mt-6 list-none mx-auto max-w-md">
             <li className="flex items-center justify-start mb-2">
-              <CheckCircle className="text-green-600 mr-2" /> 
+              <CheckCircle className="text-green-600 mr-2" />
               Save time with effortless meal planning.
             </li>
             <li className="flex items-center justify-start mb-2">
-              <CheckCircle className="text-green-600 mr-2" /> 
+              <CheckCircle className="text-green-600 mr-2" />
               Enjoy personalized meal suggestions.
             </li>
             <li className="flex items-center justify-start mb-2">
-              <CheckCircle className="text-green-600 mr-2" /> 
+              <CheckCircle className="text-green-600 mr-2" />
               Track your nutritional intake easily.
             </li>
             <li className="flex items-center justify-start mb-2">
-              <CheckCircle className="text-green-600 mr-2" /> 
+              <CheckCircle className="text-green-600 mr-2" />
               Connect with a vibrant community of food lovers.
             </li>
           </ul>
@@ -179,59 +238,6 @@ export default function Homepage() {
           </motion.button>
         </div>
       </section>
-
     </div>
   );
 }
-
-// Features Data
-const featuresData = [
-  {
-    title: "Meal Plan Creation",
-    description:
-      "Easily create weekly meal plans tailored to your dietary preferences.",
-    img: featureImages.groceryList,
-    icon: <Dumbbell />, // Unique icon for this feature
-    bullets: [
-      "Select recipes from our extensive database.",
-      "Input your own recipes for personalized planning.",
-      "Drag and drop meals into a calendar view for convenience."
-    ]
-  },
-  {
-    title: "Nutritional Tracking",
-    description:
-      "Keep track of your daily nutrition effortlessly.",
-    img: featureImages.nutritionalAnalysis,
-    icon: <BrainCircuit />, // Unique icon for this feature
-    bullets: [
-      "Log meals manually or search our recipe database.",
-      "Get insights into your macro and micronutrient intake.",
-      "Monitor your progress towards nutritional goals."
-    ]
-  },
-  {
-    title: "Grocery List Generator",
-    description:
-      "Automatically generate a grocery list based on your meal plan.",
-    img: featureImages.groceryList,
-    icon: <Users />, // Unique icon for this feature
-    bullets: [
-      "Save time by organizing shopping lists by category.",
-      "Check off items as you shop for a seamless experience.",
-      "Adjust quantities based on your needs."
-    ]
-  },
-  {
-    title: "Meal Prep Reminders",
-    description:
-      "Stay organized with reminders for meal prep times.",
-    img: featureImages.prepReminder,
-    icon: <Users />, // Unique icon for this feature
-    bullets: [
-      "Set reminders for specific meals or prep times.",
-      "Adjust reminders based on your schedule.",
-      "Never forget a meal prep again!"
-    ]
-  },
-];
