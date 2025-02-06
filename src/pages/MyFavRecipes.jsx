@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../Auth/firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, addDoc } from "firebase/firestore";
 import { useAuth } from "../Auth/AuthContext";
+
 
 export default function FavRecipes() {
   const { user } = useAuth();
@@ -15,12 +16,19 @@ export default function FavRecipes() {
   const [currentPage, setCurrentPage] = useState(1);
   const recipesPerPage = 10;
 
-  const [showTimerModal, setShowTimerModal] = useState(false);
-  const [timerMinutes, setTimerMinutes] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(null);
+  const [selectedDays, setSelectedDays] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+
+  // Timer state for each recipe
+  const [timerState, setTimerState] = useState({
+    recipeId: null,
+    timerMinutes: 0,
+    timeLeft: null,
+  });
 
   // Load audio for the timer end
-  const alarmSound = new Audio("/alarm.mp3"); // Ensure alarm.mp3 is in the public folder
+  const alarmSound = new Audio("/alarm.mp3");
 
   useEffect(() => {
     if (user) {
@@ -57,6 +65,9 @@ export default function FavRecipes() {
     }
   };
 
+ 
+
+
   const applyFilters = () => {
     let recipes = favRecipes;
 
@@ -82,30 +93,88 @@ export default function FavRecipes() {
     setCurrentPage(1);
   };
 
-  const indexOfLastRecipe = currentPage * recipesPerPage;
-  const indexOfFirstRecipe = indexOfLastRecipe - recipesPerPage;
-  const currentRecipes = filteredRecipes.slice(indexOfFirstRecipe, indexOfLastRecipe);
+  // Handle pagination
   const totalPages = Math.ceil(filteredRecipes.length / recipesPerPage);
+  const startIndex = (currentPage - 1) * recipesPerPage;
+  const currentRecipes = filteredRecipes.slice(startIndex, startIndex + recipesPerPage);
 
-  const startTimer = () => {
-    setTimeLeft(timerMinutes * 60);
-    setShowTimerModal(false);
+  const goToPage = (page) => {
+    setCurrentPage(page);
+  };
+
+
+  // Open Modal to select days for meal plan
+  const openMealPlanModal = (recipe) => {
+    setSelectedRecipe(recipe);
+    setIsModalOpen(true);
+  };
+
+  // Handle day selection for meal plan
+  const handleDaySelection = (day) => {
+    setSelectedDays((prevDays) => {
+      if (prevDays.includes(day)) {
+        return prevDays.filter((d) => d !== day);
+      } else {
+        return [...prevDays, day];
+      }
+    });
+  };
+
+  // Save meal plan to the database
+  const saveMealPlan = async () => {
+    if (!selectedRecipe || selectedDays.length === 0) return;
+
+    try {
+      const mealPlanRef = collection(db, "mealPlans");
+      await addDoc(mealPlanRef, {
+        userId: user.uid,
+        recipe: selectedRecipe,  // Save all recipe data
+        days: selectedDays,
+        createdAt: new Date(),
+      });
+
+      // Close the modal and reset selections
+      setIsModalOpen(false);
+      setSelectedRecipe(null);
+      setSelectedDays([]);
+    } catch (error) {
+      console.error("Error saving meal plan:", error);
+    }
+  };
+  // Start Timer for a specific recipe
+  const startTimer = (recipeId) => {
+    setTimerState({
+      recipeId,
+      timeLeft: timerState.timerMinutes * 60,
+    });
   };
 
   useEffect(() => {
-    if (timeLeft === null || timeLeft <= 0) return;
+    if (timerState.timeLeft === null || timerState.timeLeft <= 0) return;
     const timer = setInterval(() => {
-      setTimeLeft((prevTime) => prevTime - 1);
+      setTimerState((prevState) => ({
+        ...prevState,
+        timeLeft: prevState.timeLeft - 1,
+      }));
     }, 1000);
     return () => clearInterval(timer);
-  }, [timeLeft]);
+  }, [timerState.timeLeft]);
 
   useEffect(() => {
-    if (timeLeft === 0) {
+    if (timerState.timeLeft === 0) {
       alarmSound.play(); // Play sound when timer ends
-      alert("Baking time is over!");
+      alert(`Time's up for ${timerState.recipeId}`);
+      setTimerState({ ...timerState, timeLeft: null });
     }
-  }, [timeLeft]);
+  }, [timerState.timeLeft]);
+
+  const handleSetTimer = (recipeId, timerMinutes) => {
+    setTimerState({
+      recipeId,
+      timerMinutes,
+      timeLeft: timerMinutes * 60,
+    });
+  };
 
   if (loading) {
     return <div className="text-center text-lg font-bold">Loading...</div>;
@@ -121,6 +190,7 @@ export default function FavRecipes() {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
+      {/* Filter Section */}
       <div className="mb-8 flex flex-col md:flex-row md:justify-between gap-4">
         <input
           type="text"
@@ -150,35 +220,9 @@ export default function FavRecipes() {
           <option value="lunch">Lunch</option>
           <option value="dinner">Dinner</option>
         </select>
-        <button onClick={() => setShowTimerModal(true)} className="bg-blue-500 text-white px-4 py-2 rounded">
-          Set Timer
-        </button>
       </div>
 
-      {showTimerModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-lg">
-            <h2 className="text-lg font-bold">Set Baking Timer</h2>
-            <input
-              type="number"
-              className="w-full p-2 border rounded mt-2"
-              placeholder="Enter minutes"
-              value={timerMinutes}
-              onChange={(e) => setTimerMinutes(e.target.value)}
-            />
-            <button onClick={startTimer} className="bg-green-500 text-white px-4 py-2 rounded mt-2">
-              Start
-            </button>
-          </div>
-        </div>
-      )}
-
-      {timeLeft !== null && (
-        <div className="text-center text-lg font-bold text-red-500">
-          Time Left: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")}
-        </div>
-      )}
-
+      {/* Recipe List */}
       {filteredRecipes.length === 0 ? (
         <div className="text-center text-xl font-bold text-gray-600">
           No recipes found. Try a different filter or search term.
@@ -202,11 +246,117 @@ export default function FavRecipes() {
                       {recipe.category}
                     </span>
                   </div>
+
+                  {/* Timer in Recipe Card */}
+                  {timerState.recipeId === recipe.id ? (
+                    <div className="mt-4">
+                      <input
+                        type="number"
+                        className="w-full p-2 border rounded"
+                        placeholder="Enter minutes"
+                        value={timerState.timerMinutes}
+                        onChange={(e) =>
+                          setTimerState({
+                            ...timerState,
+                            timerMinutes: e.target.value,
+                          })
+                        }
+                      />
+                      <div className="mt-2">
+                        <button
+                          onClick={() => startTimer(recipe.id)}
+                          className="bg-green-500 text-white px-4 py-2 rounded"
+                        >
+                          Start Timer
+                        </button>
+                  
+                      </div>
+                      {timerState.timeLeft !== null && (
+                        <div className="text-lg font-bold text-red-500 mt-2">
+                          Time Left: {Math.floor(timerState.timeLeft / 60)}:
+                          {(timerState.timeLeft % 60).toString().padStart(2, "0")}
+                        </div>
+                      )}
+                    </div>
+                    
+                  ) : (
+                    <div className="mt-4">
+                      <button
+                        onClick={() => handleSetTimer(recipe.id, 10)} // Default to 10 minutes
+                        className="bg-blue-500 text-white px-4 py-2 rounded"
+                      >
+                        Set Timer
+                      </button>
+                      <button
+                onClick={() => openMealPlanModal(recipe)}
+                className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+              >
+                Add to Meal Plan
+              </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         </>
+      )}
+      {/* pagination  */}
+
+      <div className="flex justify-center mt-6">
+        <button
+          onClick={() => goToPage(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="bg-gray-500 text-white px-4 py-2 rounded-lg mx-2"
+        >
+          Prev
+        </button>
+        <span className="text-lg">{currentPage} / {totalPages}</span>
+        <button
+          onClick={() => goToPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="bg-gray-500 text-white px-4 py-2 rounded-lg mx-2"
+        >
+          Next
+        </button>
+      </div>
+
+      {/* Modal for Selecting Days */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
+          <div className="bg-white p-6 rounded-lg w-96">
+            <h2 className="text-2xl font-bold mb-4">Select Days for Meal Plan</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
+                <button
+                  key={day}
+                  onClick={() => handleDaySelection(day)}
+                  className={`w-full py-2 text-lg rounded-lg ${
+                    selectedDays.includes(day)
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200"
+                  }`}
+                >
+                  {day}
+                </button>
+              ))}
+            </div>
+            <div className="mt-4 flex justify-between">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveMealPlan}
+                className="bg-green-500 text-white px-4 py-2 rounded"
+              >
+                Save Meal Plan
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
