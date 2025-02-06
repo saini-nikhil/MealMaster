@@ -1,13 +1,15 @@
+// AuthContext.js
 import React, { createContext, useState, useContext, useEffect } from 'react';
-
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth , db } from './firebase';
+import { auth, db } from './firebase';
 
 const AuthContext = createContext();
 
@@ -40,6 +42,28 @@ export function AuthProvider({ children }) {
     return signOut(auth);
   }
 
+  async function signInWithGoogle() {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (!userDoc.exists()) {
+        await setDoc(doc(db, 'users', user.uid), {
+          email: user.email,
+          username: user.displayName || '',
+          dietaryPreferences: [],
+          allergies: [],
+          fitnessGoals: ''
+        });
+      }
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -59,6 +83,7 @@ export function AuthProvider({ children }) {
     register,
     login,
     logout,
+    signInWithGoogle,
   };
 
   return (

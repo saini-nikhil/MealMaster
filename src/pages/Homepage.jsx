@@ -1,6 +1,9 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { BrainCircuit, Dumbbell, Users, CheckCircle, Quote } from "lucide-react"; // Importing icons
+import { useAuth } from "../Auth/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 // ✅ Hero image URL (from your GitHub)
 const heroImageUrl = "https://raw.githubusercontent.com/saini-nikhil/MealMaster/main/src/assets/Meal%20Master%20Hero%20Image.svg";
@@ -25,6 +28,18 @@ const reviews = [
 ];
 
 export default function Homepage() {
+  const { user, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate, isLoading]);
+
+  if (isLoading) {
+    return <div>Loading...</div>; // Or a more sophisticated loading indicator
+  }
   return (
     <div className="bg-white min-h-screen mx-0"> {/* Ensuring white background */}
       
