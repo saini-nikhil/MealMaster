@@ -67,6 +67,16 @@ export default function Navbar() {
                       Meal Planner
                     </Link>
                   </motion.div>
+                  <motion.div variants={itemVariants}>
+                    <Link 
+                      to="/NutritionTracker" 
+                      className="relative text-gray-600 hover:text-blue-500 transition-colors duration-300
+                        before:content-[''] before:absolute before:-bottom-1 before:left-0 before:w-0 before:h-0.5 
+                        before:bg-blue-500 before:transition-all before:duration-300 hover:before:w-full"
+                    >
+                      Nutrition Tracker
+                    </Link>
+                  </motion.div>
                   
                   <motion.div variants={itemVariants}>
                     <Link 

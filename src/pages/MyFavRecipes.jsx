@@ -177,7 +177,11 @@ export default function FavRecipes() {
   };
 
   if (loading) {
-    return <div className="text-center text-lg font-bold">Loading...</div>;
+    return  (<>
+    <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+    </>)
   }
 
   if (hasError) {
@@ -189,6 +193,8 @@ export default function FavRecipes() {
   }
 
   return (
+
+    
     <div className="max-w-6xl mx-auto p-6">
       {/* Filter Section */}
       <div className="mb-8 flex flex-col md:flex-row md:justify-between gap-4">
