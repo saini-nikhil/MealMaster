@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { db } from "../Auth/firebase";
-import { collection, addDoc, getDocs, query, where, deleteDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { useAuth } from "../Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Heart, PlusCircle, Search, ChevronLeft, ChevronRight, X, BookmarkIcon } from "lucide-react";
 
 export default function Recipes() {
   const { user } = useAuth();
@@ -25,7 +34,6 @@ export default function Recipes() {
   const [currentPage, setCurrentPage] = useState(1);
   const [recipesPerPage] = useState(10);
   const [favRecipes, setFavRecipes] = useState([]); // State for favorite recipes
-
 
   useEffect(() => {
     fetchRecipes();
@@ -148,192 +156,229 @@ export default function Recipes() {
 
   const [totalPages, setTotalPages] = useState(1); // State for total pages
 
-  const naviagte = useNavigate()
-  return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="mb-8 flex flex-col md:flex-row md:justify-between gap-4">
-        <input
-          type="text"
-          placeholder="Search recipes..."
-          className="w-full md:w-1/3 p-2 border rounded"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <select
-          className="p-2 border rounded"
-          value={dietFilter}
-          onChange={(e) => setDietFilter(e.target.value)}
-        >
-          <option value="all">All Diets</option>
-          <option value="vegetarian">Vegetarian</option>
-          <option value="vegan">Vegan</option>
-          <option value="non-vegetarian">Non-Veg</option>
-          <option value="gluten-free">Gluten-Free</option>
-        </select>
-        <select
-          className="p-2 border rounded"
-          value={mealFilter}
-          onChange={(e) => setMealFilter(e.target.value)}
-        >
-          <option value="all">All Meals</option>
-          <option value="breakfast">Breakfast</option>
-          <option value="lunch">Lunch</option>
-          <option value="dinner">Dinner</option>
-        </select>
+  const navigate = useNavigate();
 
-        <button
-          onClick={() => naviagte("/FavRecipes")}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Fav Recipes
-        </button>
-        <button
-          onClick={() => setIsPopupOpen(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Add Recipes
-        </button>
-      </div>
-
-      {loading ? (
-        <div>Loading...</div>
-      ) : hasError ? (
-        <div>Error fetching recipes. Please try again later.</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recipes.map((recipe) => (
-            <div
-              key={recipe.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden"
-            >
-              <div className="p-4">
-                <h3 className="text-xl font-bold mb-2">{recipe.name}</h3>
-                <p className="text-gray-600 mb-4">{recipe.instructions}</p>
-                <div className="mb-4">
-                  <span className="font-semibold">Calories:</span>{" "}
-                  {recipe.calories}
-                </div>
-                <div className="mb-4">
-                  <span className="font-semibold">Meal Type:</span>{" "}
-                  {recipe.meal_type}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
-                    {recipe.category}
-                  </span>
-                </div>
-                <button
-                  onClick={() => handleToggleFavorites(recipe)}
-                  className={`mt-4 px-4 py-2 rounded ${
-                    favRecipes.some((fav) => fav.id === recipe.id)
-                      ? "bg-red-500"
-                      : "bg-blue-500"
-                  } text-white hover:bg-blue-600`}
-                >
-                  {favRecipes.some((fav) => fav.id === recipe.id)
-                    ? "Remove from Fav"
-                    : "Add to Fav"}
-                </button>
-              </div>
+    return (
+      <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Filter Section */}
+        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            
+            {/* Search Bar */}
+            <div className="relative sm:col-span-2 lg:col-span-1">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <input
+                type="text"
+                placeholder="Search recipes..."
+                className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* Pagination */}
-      <div className="flex justify-center mt-4">
-        <button
-          onClick={() => paginate(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md mr-2"
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => paginate(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md"
-        >
-          Next
-        </button>
-      </div>
+            {/* Diet Filter */}
+            <div className="w-full">
+              <select
+                className="w-full py-3.5 px-4 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none transition-colors shadow-sm"
+                value={dietFilter}
+                onChange={(e) => setDietFilter(e.target.value)}
+              >
+                <option value="all">All Diets</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan</option>
+                <option value="non-vegetarian">Non-Veg</option>
+                <option value="gluten-free">Gluten-Free</option>
+              </select>
+            </div>
 
-      {isPopupOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded shadow-lg w-96">
-            <h2 className="text-lg font-bold mb-4">Add New Recipe</h2>
-            <input
-              type="text"
-              placeholder="Recipe Name"
-              className="w-full p-2 border rounded mb-2"
-              value={newRecipe.name}
-              onChange={(e) =>
-                setNewRecipe({ ...newRecipe, name: e.target.value })
-              }
-            />
-            <input
-              type="text"
-              placeholder="Ingredients (comma separated)"
-              className="w-full p-2 border rounded mb-2"
-              value={newRecipe.ingredients}
-              onChange={(e) =>
-                setNewRecipe({
-                  ...newRecipe,
-                  ingredients: e.target.value.split(","),
-                })
-              }
-            />
-            <select
-              className="w-full p-2 border rounded mb-2"
-              value={newRecipe.category}
-              onChange={(e) =>
-                setNewRecipe({ ...newRecipe, category: e.target.value })
-              }
-            >
-              <option value="">Select Diet Type</option>
-              <option value="vegetarian">Vegetarian</option>
-              <option value="vegan">Vegan</option>
-              <option value="Non-Vegetarian">Non-Veg</option>
-              <option value="gluten-free">Gluten-Free</option>
-            </select>
-            <select
-              className="w-full p-2 border rounded mb-2"
-              value={newRecipe.meal_type}
-              onChange={(e) =>
-                setNewRecipe({ ...newRecipe, meal_type: e.target.value })
-              }
-            >
-              <option value="">Select Meal Type</option>
-              <option value="breakfast">Breakfast</option>
-              <option value="lunch">Lunch</option>
-              <option value="dinner">Dinner</option>
-            </select>
-            <input
-              type="number"
-              placeholder="Calories"
-              className="w-full p-2 border rounded mb-2"
-              value={newRecipe.calories}
-              onChange={(e) =>
-                setNewRecipe({ ...newRecipe, calories: e.target.value })
-              }
-            />
-            <textarea
-              placeholder="Instructions"
-              className="w-full p-2 border rounded mb-2"
-              value={newRecipe.instructions}
-              onChange={(e) =>
-                setNewRecipe({ ...newRecipe, instructions: e.target.value })
-              }
-            />
-            <button
-              onClick={handleAddRecipe}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-            >
-              Submit
-            </button>
+            {/* Meal Filter */}
+            <div className="w-full">
+              <select
+                className="w-full py-3.5 px-4 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none transition-colors shadow-sm"
+                value={mealFilter}
+                onChange={(e) => setMealFilter(e.target.value)}
+              >
+                <option value="all">All Meals</option>
+                <option value="breakfast">Breakfast</option>
+                <option value="lunch">Lunch</option>
+                <option value="dinner">Dinner</option>
+              </select>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4 sm:justify-end">
+              <button
+                onClick={() => navigate("/FavRecipes")}
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-white border-2 border-blue-500 text-blue-500 px-6 py-3 rounded-lg hover:bg-blue-50 transition-all duration-200 shadow-md"
+              >
+                <BookmarkIcon size={20} />
+                <span className="sm:hidden lg:inline font-medium">Favorites</span>
+              </button>
+              <button
+                onClick={() => setIsPopupOpen(true)}
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-all duration-200 shadow-lg"
+              >
+                <PlusCircle size={20} />
+                <span className="sm:hidden lg:inline font-medium">Add Recipe</span>
+              </button>
+            </div>
           </div>
         </div>
-      )}
-    </div>
-  );
-}
+  
+          {/* Loading and Error States */}
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : hasError ? (
+            <div className="text-center text-red-500 py-12 bg-red-50 rounded-lg">
+              <p className="text-lg font-medium">Error fetching recipes</p>
+              <p className="text-sm mt-2">Please try again later</p>
+            </div>
+          ) : (
+            /* Enhanced Recipe Grid */
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recipes.map((recipe) => (
+                <div
+                  key={recipe.id}
+                  className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-200"
+                >
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="text-xl font-bold text-gray-900 leading-tight">{recipe.name}</h3>
+                      <button
+                        onClick={() => handleToggleFavorites(recipe)}
+                        className="p-2 rounded-full hover:bg-gray-100 transition-colors group"
+                        aria-label={favRecipes.some((fav) => fav.id === recipe.id) ? "Remove from favorites" : "Add to favorites"}
+                      >
+                        <Heart
+                          size={24}
+                          className={`transition-colors ${
+                            favRecipes.some((fav) => fav.id === recipe.id)
+                              ? "text-red-500 fill-red-500"
+                              : "text-gray-400 group-hover:text-red-500"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                    <p className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">{recipe.instructions}</p>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-700">Calories:</span>
+                        <span className="text-gray-600">{recipe.calories}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-700">Meal Type:</span>
+                        <span className="text-gray-600 capitalize">{recipe.meal_type}</span>
+                      </div>
+                      <div className="pt-2">
+                        <span className="inline-block bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium">
+                          {recipe.category}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+  
+          {/* Enhanced Pagination */}
+          <div className="flex justify-center mt-8">
+            <div className="flex gap-2">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors font-medium"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors font-medium"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+  
+          {/* Enhanced Add Recipe Modal */}
+          {isPopupOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold mb-6">Add New Recipe</h2>
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      placeholder="Recipe Name"
+                      className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={newRecipe.name}
+                      onChange={(e) => setNewRecipe({ ...newRecipe, name: e.target.value })}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Ingredients (comma separated)"
+                      className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={newRecipe.ingredients}
+                      onChange={(e) => setNewRecipe({ ...newRecipe, ingredients: e.target.value.split(",") })}
+                    />
+                    <select
+                      className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={newRecipe.category}
+                      onChange={(e) => setNewRecipe({ ...newRecipe, category: e.target.value })}
+                    >
+                      <option value="">Select Diet Type</option>
+                      <option value="vegetarian">Vegetarian</option>
+                      <option value="vegan">Vegan</option>
+                      <option value="Non-Vegetarian">Non-Veg</option>
+                      <option value="gluten-free">Gluten-Free</option>
+                    </select>
+                    <select
+                      className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={newRecipe.meal_type}
+                      onChange={(e) => setNewRecipe({ ...newRecipe, meal_type: e.target.value })}
+                    >
+                      <option value="">Select Meal Type</option>
+                      <option value="breakfast">Breakfast</option>
+                      <option value="lunch">Lunch</option>
+                      <option value="dinner">Dinner</option>
+                    </select>
+                    <input
+                      type="number"
+                      placeholder="Calories"
+                      className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={newRecipe.calories}
+                      onChange={(e) => setNewRecipe({ ...newRecipe, calories: e.target.value })}
+                    />
+                    <textarea
+                      placeholder="Instructions"
+                      className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px]"
+                      value={newRecipe.instructions}
+                      onChange={(e) => setNewRecipe({ ...newRecipe, instructions: e.target.value })}
+                    />
+                    <div className="flex justify-end gap-3 mt-6">
+                      <button
+                        onClick={() => setIsPopupOpen(false)}
+                        className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleAddRecipe}
+                        className="px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                      >
+                        Add Recipe
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
