@@ -275,7 +275,7 @@ export default function Recipes() {
                         <span className="text-gray-600 capitalize">{recipe.meal_type}</span>
                       </div>
                       <div className="pt-2">
-                        <span className="inline-block bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium">
+                        <span className="inline-block bg-green-100 text-green-800 px-4 py-1.5 rounded-full text-sm font-medium">
                           {recipe.category}
                         </span>
                       </div>
