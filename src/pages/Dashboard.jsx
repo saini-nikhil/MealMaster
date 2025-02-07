@@ -138,6 +138,13 @@ export default function Dashboard() {
             <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>Browse and search recipes</p>
           </Link>
         </div>
+        {/* <div className={`p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow ${darkMode ? 'bg-gray-800' : 'bg-white'} md:col-span-1`}>
+          <Link to="/recipes">
+            <BookOpen className="w-12 h-12 mb-2 text-green-500" />
+            <h2 className="text-xl font-bold mb-2">Recipe Database</h2>
+            <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>Browse and search recipes</p>
+          </Link>
+        </div> */}
         <div className={`p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow ${darkMode ? 'bg-gray-800' : 'bg-white'} md:col-span-3`}>
           <h2 className="text-xl font-bold mb-4">Nutrition Tracking</h2>
           {loading ? (

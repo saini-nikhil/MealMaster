@@ -22,7 +22,7 @@ function App() {
       <ThemeProvider>
         <BrowserRouter>
           <Navbar />
-          <div className="container mx-auto px-4 py-8 min-h-[80vh]">
+          <div >
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
