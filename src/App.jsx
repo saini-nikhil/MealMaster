@@ -14,6 +14,7 @@ import ProtectedRoute from './pages/ProtectedRoute';
 import NutritionTracker from './pages/NutritionTracker';
 import Homepage from './pages/Homepage';
 import FavRecipes from './pages/MyFavRecipes';
+import Community from './pages/Community';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/" element={<Homepage />} />
+              <Route path="/community" element={<Community />} />
 
               <Route path="/dashboard" element={
                 <ProtectedRoute>

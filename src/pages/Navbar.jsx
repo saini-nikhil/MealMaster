@@ -69,6 +69,11 @@ export default function Navbar() {
                   </Link>
                 </motion.div>
                 <motion.div variants={itemVariants} whileHover={hoverEffect}>
+                  <Link to="/community" className="relative hover:text-blue-500 transition-colors duration-300">
+                    Community
+                  </Link>
+                </motion.div>
+                <motion.div variants={itemVariants} whileHover={hoverEffect}>
                   <Link to="/profile" className="relative hover:text-blue-500 transition-colors duration-300">
                     Profile
                   </Link>
