@@ -33,7 +33,7 @@ export default function Recipes() {
   const [loading, setLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [recipesPerPage] = useState(10);
+  const [recipesPerPage] = useState(12);
   const [favRecipes, setFavRecipes] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const { darkMode } = useTheme();
