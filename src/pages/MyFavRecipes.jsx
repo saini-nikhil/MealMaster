@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { db } from "../Auth/firebase";
 import { collection, getDocs, query, where, addDoc } from "firebase/firestore";
 import { useAuth } from "../Auth/AuthContext";
-
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function FavRecipes() {
   const { user } = useAuth();
@@ -20,15 +20,14 @@ export default function FavRecipes() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
 
-  // Timer state for each recipe
   const [timerState, setTimerState] = useState({
     recipeId: null,
     timerMinutes: 0,
     timeLeft: null,
   });
 
-  // Load audio for the timer end
   const alarmSound = new Audio("/alarm.mp3");
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     if (user) {
@@ -65,9 +64,6 @@ export default function FavRecipes() {
     }
   };
 
- 
-
-
   const applyFilters = () => {
     let recipes = favRecipes;
 
@@ -93,7 +89,6 @@ export default function FavRecipes() {
     setCurrentPage(1);
   };
 
-  // Handle pagination
   const totalPages = Math.ceil(filteredRecipes.length / recipesPerPage);
   const startIndex = (currentPage - 1) * recipesPerPage;
   const currentRecipes = filteredRecipes.slice(startIndex, startIndex + recipesPerPage);
@@ -102,14 +97,11 @@ export default function FavRecipes() {
     setCurrentPage(page);
   };
 
-
-  // Open Modal to select days for meal plan
   const openMealPlanModal = (recipe) => {
     setSelectedRecipe(recipe);
     setIsModalOpen(true);
   };
 
-  // Handle day selection for meal plan
   const handleDaySelection = (day) => {
     setSelectedDays((prevDays) => {
       if (prevDays.includes(day)) {
@@ -120,7 +112,6 @@ export default function FavRecipes() {
     });
   };
 
-  // Save meal plan to the database
   const saveMealPlan = async () => {
     if (!selectedRecipe || selectedDays.length === 0) return;
 
@@ -128,12 +119,11 @@ export default function FavRecipes() {
       const mealPlanRef = collection(db, "mealPlans");
       await addDoc(mealPlanRef, {
         userId: user.uid,
-        recipe: selectedRecipe,  // Save all recipe data
+        recipe: selectedRecipe,
         days: selectedDays,
         createdAt: new Date(),
       });
 
-      // Close the modal and reset selections
       setIsModalOpen(false);
       setSelectedRecipe(null);
       setSelectedDays([]);
@@ -141,7 +131,7 @@ export default function FavRecipes() {
       console.error("Error saving meal plan:", error);
     }
   };
-  // Start Timer for a specific recipe
+
   const startTimer = (recipeId) => {
     setTimerState({
       recipeId,
@@ -162,7 +152,7 @@ export default function FavRecipes() {
 
   useEffect(() => {
     if (timerState.timeLeft === 0) {
-      alarmSound.play(); // Play sound when timer ends
+      alarmSound.play();
       alert(`Time's up for ${timerState.recipeId}`);
       setTimerState({ ...timerState, timeLeft: null });
     }
@@ -177,11 +167,11 @@ export default function FavRecipes() {
   };
 
   if (loading) {
-    return  (<>
-    <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-    </>)
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   if (hasError) {
@@ -193,20 +183,17 @@ export default function FavRecipes() {
   }
 
   return (
-
-    
-    <div className="max-w-6xl mx-auto p-6">
-      {/* Filter Section */}
+    <div className={`max-w-6xl mx-auto p-6 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
       <div className="mb-8 flex flex-col md:flex-row md:justify-between gap-4">
         <input
           type="text"
           placeholder="Search recipes..."
-          className="w-full md:w-1/3 p-2 border rounded"
+          className={`w-full md:w-1/3 p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <select
-          className="p-2 border rounded"
+          className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}
           value={dietFilter}
           onChange={(e) => setDietFilter(e.target.value)}
         >
@@ -217,7 +204,7 @@ export default function FavRecipes() {
           <option value="gluten-free">Gluten-Free</option>
         </select>
         <select
-          className="p-2 border rounded"
+          className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}
           value={mealFilter}
           onChange={(e) => setMealFilter(e.target.value)}
         >
@@ -228,19 +215,18 @@ export default function FavRecipes() {
         </select>
       </div>
 
-      {/* Recipe List */}
       {filteredRecipes.length === 0 ? (
-        <div className="text-center text-xl font-bold text-gray-600">
+        <div className={`text-center text-xl font-bold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
           No recipes found. Try a different filter or search term.
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {currentRecipes.map((recipe) => (
-              <div key={recipe.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div key={recipe.id} className={`rounded-lg shadow-md overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                 <div className="p-4">
-                  <h3 className="text-xl font-bold mb-2">{recipe.name}</h3>
-                  <p className="text-gray-600 mb-4">{recipe.instructions}</p>
+                  <h3 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>{recipe.name}</h3>
+                  <p className={`mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{recipe.instructions}</p>
                   <div className="mb-4">
                     <span className="font-semibold">Calories:</span> {recipe.calories}
                   </div>
@@ -248,17 +234,16 @@ export default function FavRecipes() {
                     <span className="font-semibold">Meal Type:</span> {recipe.meal_type}
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
+                    <span className={`px-2 py-1 rounded text-sm ${darkMode ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800'}`}>
                       {recipe.category}
                     </span>
                   </div>
 
-                  {/* Timer in Recipe Card */}
                   {timerState.recipeId === recipe.id ? (
                     <div className="mt-4">
                       <input
                         type="number"
-                        className="w-full p-2 border rounded"
+                        className={`w-full p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}
                         placeholder="Enter minutes"
                         value={timerState.timerMinutes}
                         onChange={(e) =>
@@ -275,7 +260,6 @@ export default function FavRecipes() {
                         >
                           Start Timer
                         </button>
-                  
                       </div>
                       {timerState.timeLeft !== null && (
                         <div className="text-lg font-bold text-red-500 mt-2">
@@ -284,21 +268,20 @@ export default function FavRecipes() {
                         </div>
                       )}
                     </div>
-                    
                   ) : (
-                    <div className="mt-4">
+                    <div className="mt-4 flex items-center gap-4">
                       <button
-                        onClick={() => handleSetTimer(recipe.id, 10)} // Default to 10 minutes
+                        onClick={() => handleSetTimer(recipe.id, 10)}
                         className="bg-blue-500 text-white px-4 py-2 rounded"
                       >
                         Set Timer
                       </button>
                       <button
-                onClick={() => openMealPlanModal(recipe)}
-                className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
-              >
-                Add to Meal Plan
-              </button>
+                        onClick={() => openMealPlanModal(recipe)}
+                        className="bg-blue-500 text-white px-4 py-2 rounded"
+                      >
+                        Add to Meal Plan
+                      </button>
                     </div>
                   )}
                 </div>
@@ -307,30 +290,28 @@ export default function FavRecipes() {
           </div>
         </>
       )}
-      {/* pagination  */}
 
       <div className="flex justify-center mt-6">
         <button
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 1}
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg mx-2"
+          className={`px-4 py-2 rounded-lg mx-2 ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-500 text-white'}`}
         >
           Prev
         </button>
-        <span className="text-lg">{currentPage} / {totalPages}</span>
+        <span className={`text-lg ${darkMode ? 'text-white' : 'text-black'}`}>{currentPage} / {totalPages}</span>
         <button
           onClick={() => goToPage(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg mx-2"
+          className={`px-4 py-2 rounded-lg mx-2 ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-500 text-white'}`}
         >
           Next
         </button>
       </div>
 
-      {/* Modal for Selecting Days */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
-          <div className="bg-white p-6 rounded-lg w-96">
+          <div className={`p-6 rounded-lg w-96 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
             <h2 className="text-2xl font-bold mb-4">Select Days for Meal Plan</h2>
             <div className="grid grid-cols-2 gap-4">
               {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
@@ -340,6 +321,8 @@ export default function FavRecipes() {
                   className={`w-full py-2 text-lg rounded-lg ${
                     selectedDays.includes(day)
                       ? "bg-blue-500 text-white"
+                      : darkMode
+                      ? "bg-gray-700"
                       : "bg-gray-200"
                   }`}
                 >
