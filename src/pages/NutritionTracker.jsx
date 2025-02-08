@@ -7,6 +7,8 @@ import {
   getDocs,
   deleteDoc,
   doc,
+  query,
+  where
 } from "firebase/firestore";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { useTheme } from '../contexts/ThemeContext';
@@ -44,7 +46,10 @@ export default function NutritionTracker() {
     setHasError(false);
     try {
       const mealRef = collection(db, "nutritionTracker");
-      const querySnapshot = await getDocs(mealRef);
+
+      // Create a query to fetch only meals for the logged-in user
+      const q = query(mealRef, where("userId", "==", user.uid));
+      const querySnapshot = await getDocs(q);
       const meals = [];
       querySnapshot.forEach((docSnap) => {
         meals.push({ id: docSnap.id, ...docSnap.data() });
@@ -108,7 +113,7 @@ export default function NutritionTracker() {
     const mealRef = collection(db, "nutritionTracker");
     try {
       await addDoc(mealRef, {
-        userId: user.uid,
+        userId: user.uid,  // Store the user ID along with the meal data
         ...meal,
       });
       fetchLoggedMeals();

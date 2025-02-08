@@ -104,7 +104,10 @@ export default function Recipes() {
       const querySnapshot = await getDocs(favRef);
       const favoriteRecipes = [];
       querySnapshot.forEach((docSnap) => {
-        favoriteRecipes.push({ id: docSnap.id, ...docSnap.data() });
+        favoriteRecipes.push({ 
+          firestoreId: docSnap.id,  // Store the Firestore document ID
+          ...docSnap.data() 
+        });
       });
       setFavRecipes(favoriteRecipes);
     } catch (error) {
@@ -113,18 +116,32 @@ export default function Recipes() {
   };
 
   const handleToggleFavorites = async (recipe) => {
-    const isFavorited = favRecipes.some((fav) => fav.id === recipe.id);
+    if (!user) {
+      alert("Please login to save favorites");
+      return;
+    }
 
-    if (isFavorited) {
-      const favDoc = doc(db, "userRecipes", recipe.id);
-      await deleteDoc(favDoc);
-      setFavRecipes(favRecipes.filter((fav) => fav.id !== recipe.id));
-    } else {
-      await addDoc(collection(db, "userRecipes"), {
-        userId: user.uid,
-        ...recipe,
-      });
-      setFavRecipes([...favRecipes, { id: recipe.id, ...recipe }]);
+    try {
+      const isFavorited = favRecipes.some((fav) => fav.id === recipe.id);
+
+      if (isFavorited) {
+        // Find the Firestore document ID for this recipe
+        const favoriteDoc = favRecipes.find((fav) => fav.id === recipe.id);
+        if (favoriteDoc) {
+          const favDoc = doc(db, "userRecipes", favoriteDoc.firestoreId);
+          await deleteDoc(favDoc);
+          setFavRecipes(favRecipes.filter((fav) => fav.id !== recipe.id));
+        }
+      } else {
+        const docRef = await addDoc(collection(db, "userRecipes"), {
+          userId: user.uid,
+          ...recipe,
+        });
+        setFavRecipes([...favRecipes, { firestoreId: docRef.id, ...recipe }]);
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      alert("Error updating favorites. Please try again.");
     }
   };
 

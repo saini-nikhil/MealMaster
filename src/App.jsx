@@ -18,52 +18,52 @@ import Community from './pages/Community';
 
 function App() {
   return ( 
-
-    
     <AuthProvider>
       <ThemeProvider>
         <BrowserRouter>
-          <Navbar />
-          <div >
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/" element={<Homepage />} />
-              <Route path="/community" element={<Community />} />
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <div className="flex-grow">
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/" element={<Homepage />} />
+                <Route path="/community" element={<Community />} />
 
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/profile" element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              } />
-              <Route path="/meal-planner" element={
-                <ProtectedRoute>
-                  <MealPlanner />
-                </ProtectedRoute>
-              } />
-              <Route path="/recipes" element={
-                <ProtectedRoute>
-                  <Recipes />
-                </ProtectedRoute>
-              } />
-              <Route path="/NutritionTracker" element={
-                <ProtectedRoute>
-                  <NutritionTracker />
-                </ProtectedRoute>
-              } />
-              <Route path="/FavRecipes" element={
-                <ProtectedRoute>
-                  <FavRecipes />
-                </ProtectedRoute>
-              } />
-            </Routes>
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } />
+                <Route path="/meal-planner" element={
+                  <ProtectedRoute>
+                    <MealPlanner />
+                  </ProtectedRoute>
+                } />
+                <Route path="/recipes" element={
+                  <ProtectedRoute>
+                    <Recipes />
+                  </ProtectedRoute>
+                } />
+                <Route path="/NutritionTracker" element={
+                  <ProtectedRoute>
+                    <NutritionTracker />
+                  </ProtectedRoute>
+                } />
+                <Route path="/FavRecipes" element={
+                  <ProtectedRoute>
+                    <FavRecipes />
+                  </ProtectedRoute>
+                } />
+              </Routes>
+            </div>
+            <Footer />
           </div>
-          <Footer />
         </BrowserRouter>
       </ThemeProvider>
     </AuthProvider>
