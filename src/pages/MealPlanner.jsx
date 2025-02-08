@@ -6,30 +6,6 @@ import { useAuth } from '../Auth/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';  // Import the useTheme hook
 import { motion } from 'framer-motion';
 
-// Mock data - replace with your actual data fetching logic
-const mockFavRecipes = [
-  {
-    id: '1',
-    name: 'Vegetable Stir Fry',
-    category: 'vegetarian',
-    instructions: 'Stir fry vegetables with sauce',
-    calories: 300
-  },
-  {
-    id: '2',
-    name: 'Chicken Curry',
-    category: 'non-vegetarian',
-    instructions: 'Cook chicken with curry sauce',
-    calories: 450
-  },
-  {
-    id: '3',
-    name: 'Quinoa Bowl',
-    category: 'gluten-free',
-    instructions: 'Mix quinoa with vegetables',
-    calories: 350
-  }
-];
 
 const categories = ['all', 'vegetarian', 'vegan', 'non-vegetarian', 'gluten-free'];
 

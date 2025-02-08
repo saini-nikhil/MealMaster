@@ -15,6 +15,7 @@ import NutritionTracker from './pages/NutritionTracker';
 import Homepage from './pages/Homepage';
 import FavRecipes from './pages/MyFavRecipes';
 import Community from './pages/Community';
+import ChatInterface from './pages/ChatInterface';
 
 function App() {
   return ( 
@@ -58,6 +59,11 @@ function App() {
                 <Route path="/FavRecipes" element={
                   <ProtectedRoute>
                     <FavRecipes />
+                  </ProtectedRoute>
+                } />
+                <Route path="/ChatInterface" element={
+                  <ProtectedRoute>
+                    <ChatInterface />
                   </ProtectedRoute>
                 } />
               </Routes>

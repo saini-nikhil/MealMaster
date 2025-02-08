@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../Auth/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { motion } from 'framer-motion';
-import { Menu, X, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sun, Moon, MessageSquare } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -102,19 +102,36 @@ export default function Navbar() {
               </div>
             )}
           </motion.div>
-          <motion.div className="flex items-center" variants={itemVariants}>
-            <motion.button
-              onClick={toggleDarkMode}
-              className="ml-4 p-2 rounded-full transition-colors duration-300 transform hover:scale-110 shadow-md"
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.5 }}
-            >
-              {darkMode ? <Sun className="w-6 h-6 text-yellow-400" /> : <Moon className="w-6 h-6 text-gray-800" />}
-            </motion.button>
-          </motion.div>
+          <div className="flex items-center space-x-4">
+            <motion.div variants={itemVariants}>
+              <Link
+                to="/ChatInterface"
+                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 flex items-center justify-center"
+                whileHover={{ scale: 1.1 }}
+              >
+                <MessageSquare className="w-6 h-6 text-blue-500" />
+              </Link>
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <motion.button
+                onClick={toggleDarkMode}
+                className="p-2 rounded-full transition-colors duration-300 transform hover:scale-110 shadow-md"
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.5 }}
+              >
+                {darkMode ? <Sun className="w-6 h-6 text-yellow-400" /> : <Moon className="w-6 h-6 text-gray-800" />}
+              </motion.button>
+            </motion.div>
+          </div>
         </div>
 
-        <div className="md:hidden flex items-center">
+        <div className="md:hidden flex items-center space-x-2">
+          <Link
+            to="/ChatInterface"
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300"
+          >
+            <MessageSquare className="w-6 h-6 text-blue-500" />
+          </Link>
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="text-gray-600 hover:text-blue-500 transition-colors"
@@ -123,7 +140,7 @@ export default function Navbar() {
           </button>
           <motion.button
             onClick={toggleDarkMode}
-            className="ml-4 p-2 rounded-full shadow-md"
+            className="p-2 rounded-full shadow-md"
             whileHover={{ rotate: 360 }}
             transition={{ duration: 0.5 }}
           >
@@ -144,8 +161,14 @@ export default function Navbar() {
                 <Link to="/meal-planner" className="block px-4 py-2 text-gray-600 hover:bg-blue-50 rounded-lg transition-colors" onClick={() => setIsMenuOpen(false)}>
                   Meal Planner
                 </Link>
+                <Link to="/NutritionTracker" className="block px-4 py-2 text-gray-600 hover:bg-blue-50 rounded-lg transition-colors" onClick={() => setIsMenuOpen(false)}>
+                Nutrition Tracker
+                </Link>
                 <Link to="/recipes" className="block px-4 py-2 text-gray-600 hover:bg-blue-50 rounded-lg transition-colors" onClick={() => setIsMenuOpen(false)}>
                   Recipes
+                </Link>
+                <Link to="/community" className="block px-4 py-2 text-gray-600 hover:bg-blue-50 rounded-lg transition-colors" onClick={() => setIsMenuOpen(false)}>
+                 Community
                 </Link>
                 <Link to="/profile" className="block px-4 py-2 text-gray-600 hover:bg-blue-50 rounded-lg transition-colors" onClick={() => setIsMenuOpen(false)}>
                   Profile
@@ -168,10 +191,8 @@ export default function Navbar() {
               </>
             )}
           </div>
-
         </motion.div>
       )}
-      
     </nav>
   );
 }
