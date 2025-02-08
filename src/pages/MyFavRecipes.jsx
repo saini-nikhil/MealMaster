@@ -3,6 +3,7 @@ import { db } from "../Auth/firebase";
 import { collection, getDocs, query, where, addDoc } from "firebase/firestore";
 import { useAuth } from "../Auth/AuthContext";
 import { useTheme } from '../contexts/ThemeContext';
+import { toast } from 'react-hot-toast';
 
 export default function FavRecipes() {
   const { user } = useAuth();
@@ -19,7 +20,8 @@ export default function FavRecipes() {
   const [selectedDays, setSelectedDays] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
-
+  
+  const [mealType, setMealType] = useState("breakfast");
   const [timerState, setTimerState] = useState({
     recipeId: null,
     timerMinutes: 0,
@@ -114,21 +116,37 @@ export default function FavRecipes() {
 
   const saveMealPlan = async () => {
     if (!selectedRecipe || selectedDays.length === 0) return;
-
+  
     try {
       const mealPlanRef = collection(db, "mealPlans");
-      await addDoc(mealPlanRef, {
-        userId: user.uid,
-        recipe: selectedRecipe,
-        days: selectedDays,
-        createdAt: new Date(),
-      });
-
+      
+      // Create a meal plan for each selected day
+      const promises = selectedDays.map(day => 
+        addDoc(mealPlanRef, {
+          userId: user.uid,
+          recipe: {
+            id: selectedRecipe.id,
+            name: selectedRecipe.name,
+            category: selectedRecipe.category,
+            instructions: selectedRecipe.instructions,
+            calories: selectedRecipe.calories,
+            meal_type: selectedRecipe.meal_type
+          },
+          day,
+          mealType,
+          createdAt: new Date()
+        })
+      );
+  
+      await Promise.all(promises);
+  
       setIsModalOpen(false);
       setSelectedRecipe(null);
       setSelectedDays([]);
+      toast.success('Meal plan added successfully!');
     } catch (error) {
       console.error("Error saving meal plan:", error);
+      toast.error('Failed to add meal plan');
     }
   };
 
@@ -290,7 +308,6 @@ export default function FavRecipes() {
           </div>
         </>
       )}
-
       <div className="flex justify-center mt-6">
         <button
           onClick={() => goToPage(currentPage - 1)}
@@ -308,45 +325,61 @@ export default function FavRecipes() {
           Next
         </button>
       </div>
-
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
-          <div className={`p-6 rounded-lg w-96 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
-            <h2 className="text-2xl font-bold mb-4">Select Days for Meal Plan</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
-                <button
-                  key={day}
-                  onClick={() => handleDaySelection(day)}
-                  className={`w-full py-2 text-lg rounded-lg ${
-                    selectedDays.includes(day)
-                      ? "bg-blue-500 text-white"
-                      : darkMode
-                      ? "bg-gray-700"
-                      : "bg-gray-200"
-                  }`}
-                >
-                  {day}
-                </button>
-              ))}
-            </div>
-            <div className="mt-4 flex justify-between">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={saveMealPlan}
-                className="bg-green-500 text-white px-4 py-2 rounded"
-              >
-                Save Meal Plan
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
+    <div className={`p-6 rounded-lg w-96 transform transition-all duration-300 ease-in-out ${
+      isModalOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+    } ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
+      <h2 className="text-2xl font-bold mb-4">Select Days for Meal Plan</h2>
+      <div className="grid grid-cols-2 gap-4">
+        {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
+          <button
+            key={day}
+            onClick={() => handleDaySelection(day)}
+            className={`w-full py-2 text-lg rounded-lg transform transition-all duration-200 hover:scale-105 ${
+              selectedDays.includes(day)
+                ? "bg-blue-500 text-white shadow-lg"
+                : darkMode
+                ? "bg-gray-700 hover:bg-gray-600"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
+          >
+            {day}
+          </button>
+        ))}
+      </div>
+      <div className="mt-4">
+        <select
+          className={`p-2 border rounded w-full transition-colors duration-200 ${
+            darkMode 
+              ? 'bg-gray-700 border-gray-600 focus:border-blue-500' 
+              : 'bg-gray-50 border-gray-300 focus:border-blue-500'
+          }`}
+          value={mealType}
+          onChange={(e) => setMealType(e.target.value)}
+        >
+          <option value="breakfast">Breakfast</option>
+          <option value="lunch">Lunch</option>
+          <option value="dinner">Dinner</option>
+        </select>
+      </div>
+      <div className="mt-4 flex justify-between">
+        <button
+          onClick={() => setIsModalOpen(false)}
+          className="bg-gray-500 text-white px-4 py-2 rounded transform transition-all duration-200 hover:scale-105 hover:bg-gray-600"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={saveMealPlan}
+          className="bg-green-500 text-white px-4 py-2 rounded transform transition-all duration-200 hover:scale-105 hover:bg-green-600"
+        >
+          Save Meal Plan
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
