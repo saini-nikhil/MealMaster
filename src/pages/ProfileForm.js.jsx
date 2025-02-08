@@ -28,6 +28,7 @@ const ProfileForm = ({ user }) => {
         <option value="vegetarian">Vegetarian</option>
         <option value="vegan">Vegan</option>
         <option value="gluten-free">Gluten-free</option>
+        <option value="">Non-Veg</option>
       </select>
       {/* Add other form fields */}
       <button type="submit">Save Profile</button>

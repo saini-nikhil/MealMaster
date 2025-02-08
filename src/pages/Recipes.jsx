@@ -12,7 +12,7 @@ import {
 } from "firebase/firestore";
 import { useAuth } from "../Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Heart, PlusCircle, Search, BookmarkIcon } from "lucide-react";
+import { Heart, PlusCircle, Search, BookmarkIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { useTheme } from '../contexts/ThemeContext';
 
 export default function Recipes() {
@@ -22,6 +22,7 @@ export default function Recipes() {
   const [dietFilter, setDietFilter] = useState("all");
   const [mealFilter, setMealFilter] = useState("all");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [expandedRecipe, setExpandedRecipe] = useState(null);
   const [newRecipe, setNewRecipe] = useState({
     name: "",
     ingredients: "",
@@ -105,7 +106,7 @@ export default function Recipes() {
       const favoriteRecipes = [];
       querySnapshot.forEach((docSnap) => {
         favoriteRecipes.push({ 
-          firestoreId: docSnap.id,  // Store the Firestore document ID
+          firestoreId: docSnap.id,
           ...docSnap.data() 
         });
       });
@@ -125,7 +126,6 @@ export default function Recipes() {
       const isFavorited = favRecipes.some((fav) => fav.id === recipe.id);
 
       if (isFavorited) {
-        // Find the Firestore document ID for this recipe
         const favoriteDoc = favRecipes.find((fav) => fav.id === recipe.id);
         if (favoriteDoc) {
           const favDoc = doc(db, "userRecipes", favoriteDoc.firestoreId);
@@ -143,6 +143,10 @@ export default function Recipes() {
       console.error("Error toggling favorite:", error);
       alert("Error updating favorites. Please try again.");
     }
+  };
+
+  const toggleIngredients = (recipeId) => {
+    setExpandedRecipe(expandedRecipe === recipeId ? null : recipeId);
   };
 
   const handleAddRecipe = async () => {
@@ -177,8 +181,11 @@ export default function Recipes() {
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className={`rounded-xl shadow-md p-6 mb-8 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            
             <div className="relative sm:col-span-2 lg:col-span-1">
+              
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
                 type="text"
@@ -235,57 +242,94 @@ export default function Recipes() {
           </div>
         </div>
 
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-          </div>
-        ) : hasError ? (
-          <div className={`text-center py-12 ${darkMode ? 'bg-red-900 text-red-300' : 'bg-red-50 text-red-500'} rounded-lg`}>
-            <p className="text-lg font-medium">Error fetching recipes</p>
-            <p className="text-sm mt-2">Please try again later</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recipes.map((recipe) => (
-              <div
-                key={recipe.id}
-                className={`rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-200 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}
-              >
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className={`text-xl font-bold leading-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>{recipe.name}</h3>
-                    <button
-                      onClick={() => handleToggleFavorites(recipe)}
-                      className="p-2 rounded-full hover:bg-gray-100 transition-colors group"
-                      aria-label={favRecipes.some((fav) => fav.id === recipe.id) ? "Remove from favorites" : "Add to favorites"}
-                    >
-                      <Heart
-                        size={24}
-                        className={`transition-colors ${favRecipes.some((fav) => fav.id === recipe.id) ? "text-red-500 fill-red-500" : "text-gray-400 group-hover:text-red-500"}`}
-                      />
-                    </button>
+ 
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      ) : hasError ? (
+        <div className={`text-center py-12 ${darkMode ? 'bg-red-900 text-red-300' : 'bg-red-50 text-red-500'} rounded-lg`}>
+          <p className="text-lg font-medium">Error fetching recipes</p>
+          <p className="text-sm mt-2">Please try again later</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {recipes.map((recipe) => (
+            <div
+              key={recipe.id}
+              className={`rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-200 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}
+            >
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className={`text-xl font-bold leading-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>{recipe.name}</h3>
+                  <button
+                    onClick={() => handleToggleFavorites(recipe)}
+                    className="p-2 rounded-full hover:bg-gray-100 transition-colors group"
+                    aria-label={favRecipes.some((fav) => fav.id === recipe.id) ? "Remove from favorites" : "Add to favorites"}
+                  >
+                    <Heart
+                      size={24}
+                      className={`transition-colors ${favRecipes.some((fav) => fav.id === recipe.id) ? "text-red-500 fill-red-500" : "text-gray-400 group-hover:text-red-500"}`}
+                    />
+                  </button>
+                </div>
+                <p className={`mb-4 line-clamp-3 leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{recipe.instructions}</p>
+                
+                <div className="space-y-3">
+                  <button
+                    onClick={() => toggleIngredients(recipe.id)}
+                    className={`w-full flex items-center justify-between p-3 rounded-lg ${
+                      darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
+                    } transition-colors`}
+                  >
+                    <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Ingredients
+                    </span>
+                    {expandedRecipe === recipe.id ? (
+                      <ChevronUp size={20} className="text-gray-400" />
+                    ) : (
+                      <ChevronDown size={20} className="text-gray-400" />
+                    )}
+                  </button>
+                  
+                  {expandedRecipe === recipe.id && (
+                    <div className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                      <ul className="list-disc list-inside space-y-2">
+                        {Array.isArray(recipe.ingredients) ? (
+                          recipe.ingredients.map((ingredient, index) => (
+                            <li key={index} className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                              {ingredient.trim()}
+                            </li>
+                          ))
+                        ) : (
+                          <li className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            {recipe.ingredients}
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-2">
+                    <span className={`font-medium ${darkMode ? 'text-gray-400' : 'text-gray-700'}`}>Calories:</span>
+                    <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>{recipe.calories}</span>
                   </div>
-                  <p className={`mb-4 line-clamp-3 leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{recipe.instructions}</p>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <span className={`font-medium ${darkMode ? 'text-gray-400' : 'text-gray-700'}`}>Calories:</span>
-                      <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>{recipe.calories}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`font-medium ${darkMode ? 'text-gray-400' : 'text-gray-700'}`}>Meal Type:</span>
-                      <span className={darkMode ? 'text-gray-400' : 'text-gray-600 capitalize'}>{recipe.meal_type}</span>
-                    </div>
-                    <div className="pt-2">
-                      <span className={`inline-block text-sm font-medium ${darkMode ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800'} rounded-full px-4 py-1.5`}>
-                        {recipe.category}
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`font-medium ${darkMode ? 'text-gray-400' : 'text-gray-700'}`}>Meal Type:</span>
+                    <span className={darkMode ? 'text-gray-400' : 'text-gray-600 capitalize'}>{recipe.meal_type}</span>
+                  </div>
+                  <div className="pt-2">
+                    <span className={`inline-block text-sm font-medium ${darkMode ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800'} rounded-full px-4 py-1.5`}>
+                      {recipe.category}
+                    </span>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
+      )}
+
 
         <div className="flex justify-center mt-8">
           <div className="flex gap-2">

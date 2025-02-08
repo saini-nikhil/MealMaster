@@ -4,6 +4,8 @@ import { collection, getDocs, query, where, addDoc } from "firebase/firestore";
 import { useAuth } from "../Auth/AuthContext";
 import { useTheme } from '../contexts/ThemeContext';
 import { toast } from 'react-hot-toast';
+import { Search, Timer, CalendarRange, ChevronDown, ChevronUp } from "lucide-react";
+// import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
 export default function FavRecipes() {
   const { user } = useAuth();
@@ -15,7 +17,8 @@ export default function FavRecipes() {
   const [loading, setLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const recipesPerPage = 10;
+  const [expandedRecipe, setExpandedRecipe] = useState(null);
+  const recipesPerPage = 12;
 
   const [selectedDays, setSelectedDays] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,6 +68,9 @@ export default function FavRecipes() {
       setLoading(false);
     }
   };
+
+
+  
 
   const applyFilters = () => {
     let recipes = favRecipes;
@@ -183,6 +189,11 @@ export default function FavRecipes() {
       timeLeft: timerMinutes * 60,
     });
   };
+  
+  const toggleIngredients = (recipeId) => {
+    setExpandedRecipe(expandedRecipe === recipeId ? null : recipeId);
+  };
+  
 
   if (loading) {
     return (
@@ -201,185 +212,266 @@ export default function FavRecipes() {
   }
 
   return (
-    <div className={`max-w-6xl mx-auto p-6 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
-      <div className="mb-8 flex flex-col md:flex-row md:justify-between gap-4">
-        <input
-          type="text"
-          placeholder="Search recipes..."
-          className={`w-full md:w-1/3 p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <select
-          className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}
-          value={dietFilter}
-          onChange={(e) => setDietFilter(e.target.value)}
-        >
-          <option value="all">All Diets</option>
-          <option value="vegetarian">Vegetarian</option>
-          <option value="vegan">Vegan</option>
-          <option value="non-vegetarian">Non-Veg</option>
-          <option value="gluten-free">Gluten-Free</option>
-        </select>
-        <select
-          className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}
-          value={mealFilter}
-          onChange={(e) => setMealFilter(e.target.value)}
-        >
-          <option value="all">All Meals</option>
-          <option value="breakfast">Breakfast</option>
-          <option value="lunch">Lunch</option>
-          <option value="dinner">Dinner</option>
-        </select>
-      </div>
-
-      {filteredRecipes.length === 0 ? (
-        <div className={`text-center text-xl font-bold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-          No recipes found. Try a different filter or search term.
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Card Container */}
+        <div className={`mb-8 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg rounded-lg overflow-hidden`}>
+          <div className={`p-4 ${darkMode ? 'text-white' : 'bg-gray-200'}`}>
+            <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              Favorite Recipes
+            </h1>
+          </div>
+  
+          <div className="p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              <div className="relative sm:col-span-2 lg:col-span-1">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Search recipes..."
+                  className={`w-full pl-12 pr-4 py-3.5 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'} border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm`}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+  
+              {/* Diet Filter Dropdown */}
+              <select
+                className={`w-full py-3.5 px-4 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'} border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none transition-colors shadow-sm`}
+                value={dietFilter}
+                onChange={(e) => setDietFilter(e.target.value)}
+              >
+                <option value="all">All Diets</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan</option>
+                <option value="non-vegetarian">Non-Veg</option>
+                <option value="gluten-free">Gluten-Free</option>
+              </select>
+  
+              {/* Meal Filter Dropdown */}
+              <select
+                className={`w-full py-3.5 px-4 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'} border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none transition-colors shadow-sm`}
+                value={mealFilter}
+                onChange={(e) => setMealFilter(e.target.value)}
+              >
+                <option value="all">All Meals</option>
+                <option value="breakfast">Breakfast</option>
+                <option value="lunch">Lunch</option>
+                <option value="dinner">Dinner</option>
+              </select>
+            </div>
+          </div>
         </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  
+        {/* Loading, Error or Recipe List */}
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : hasError ? (
+          <div className={`text-center py-12 ${darkMode ? 'bg-red-900 text-red-300' : 'bg-red-50 text-red-500'} rounded-lg`}>
+            <p className="text-lg font-medium">Error fetching recipes</p>
+            <p className="text-sm mt-2">Please try again later</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {currentRecipes.map((recipe) => (
-              <div key={recipe.id} className={`rounded-lg shadow-md overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                <div className="p-4">
-                  <h3 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>{recipe.name}</h3>
-                  <p className={`mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{recipe.instructions}</p>
-                  <div className="mb-4">
-                    <span className="font-semibold">Calories:</span> {recipe.calories}
-                  </div>
-                  <div className="mb-4">
-                    <span className="font-semibold">Meal Type:</span> {recipe.meal_type}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <span className={`px-2 py-1 rounded text-sm ${darkMode ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800'}`}>
-                      {recipe.category}
-                    </span>
-                  </div>
-
-                  {timerState.recipeId === recipe.id ? (
-                    <div className="mt-4">
-                      <input
-                        type="number"
-                        className={`w-full p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}
-                        placeholder="Enter minutes"
-                        value={timerState.timerMinutes}
-                        onChange={(e) =>
-                          setTimerState({
-                            ...timerState,
-                            timerMinutes: e.target.value,
-                          })
-                        }
-                      />
-                      <div className="mt-2">
-                        <button
-                          onClick={() => startTimer(recipe.id)}
-                          className="bg-green-500 text-white px-4 py-2 rounded"
-                        >
-                          Start Timer
-                        </button>
-                      </div>
-                      {timerState.timeLeft !== null && (
-                        <div className="text-lg font-bold text-red-500 mt-2">
-                          Time Left: {Math.floor(timerState.timeLeft / 60)}:
-                          {(timerState.timeLeft % 60).toString().padStart(2, "0")}
-                        </div>
+              <div
+                key={recipe.id}
+                className={`rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-200 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}
+              >
+                <div className="p-6">
+                  <h3 className={`text-xl font-bold leading-tight mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {recipe.name}
+                  </h3>
+                  <p className={`mb-4 line-clamp-3 leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    {recipe.instructions}
+                  </p>
+  
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => toggleIngredients(recipe.id)}
+                      className={`w-full flex items-center justify-between p-3 rounded-lg ${
+                        darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
+                      } transition-colors`}
+                    >
+                      <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Ingredients
+                      </span>
+                      {expandedRecipe === recipe.id ? (
+                        <ChevronUp size={20} className="text-gray-400" />
+                      ) : (
+                        <ChevronDown size={20} className="text-gray-400" />
                       )}
+                    </button>
+  
+                    {expandedRecipe === recipe.id && (
+                      <div className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                        <ul className="list-disc list-inside space-y-2">
+                          {Array.isArray(recipe.ingredients) ? (
+                            recipe.ingredients.map((ingredient, index) => (
+                              <li key={index} className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                                {ingredient.trim()}
+                              </li>
+                            ))
+                          ) : (
+                            <li className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                              {recipe.ingredients}
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+  
+                    {/* Calories and Meal Type */}
+                    <div className="flex items-center gap-2">
+                      <span className={`font-medium ${darkMode ? 'text-gray-400' : 'text-gray-700'}`}>Calories:</span>
+                      <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>{recipe.calories}</span>
                     </div>
-                  ) : (
-                    <div className="mt-4 flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className={`font-medium ${darkMode ? 'text-gray-400' : 'text-gray-700'}`}>Meal Type:</span>
+                      <span className={darkMode ? 'text-gray-400' : 'text-gray-600 capitalize'}>{recipe.meal_type}</span>
+                    </div>
+                    <div className="pt-2">
+                      <span className={`inline-block text-sm font-medium ${darkMode ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800'} rounded-full px-4 py-1.5`}>
+                        {recipe.category}
+                      </span>
+                    </div>
+  
+                    {/* Timer and Meal Plan buttons */}
+                    <div className="flex gap-3 mt-4">
                       <button
                         onClick={() => handleSetTimer(recipe.id, 10)}
-                        className="bg-blue-500 text-white px-4 py-2 rounded"
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-sm"
                       >
-                        Set Timer
+                        <Timer size={18} />
+                        <span>Set Timer</span>
                       </button>
                       <button
                         onClick={() => openMealPlanModal(recipe)}
-                        className="bg-blue-500 text-white px-4 py-2 rounded"
+                        className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors shadow-sm"
                       >
-                        Add to Meal Plan
+                        <CalendarRange size={18} />
+                        <span>Add to Meal Plan</span>
                       </button>
                     </div>
-                  )}
+  
+                    {/* Timer state */}
+                    {timerState.recipeId === recipe.id && (
+                      <div className="mt-4 space-y-3">
+                        <input
+                          type="number"
+                          className={`w-full p-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}
+                          placeholder="Enter minutes"
+                          value={timerState.timerMinutes}
+                          onChange={(e) => setTimerState({
+                            ...timerState,
+                            timerMinutes: e.target.value,
+                          })}
+                        />
+                        {timerState.timeLeft !== null && (
+                          <div className="text-lg font-bold text-center p-2 bg-red-500 text-white rounded-lg">
+                            {Math.floor(timerState.timeLeft / 60)}:
+                            {(timerState.timeLeft % 60).toString().padStart(2, "0")}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-        </>
-      )}
-      <div className="flex justify-center mt-6">
-        <button
-          onClick={() => goToPage(currentPage - 1)}
-          disabled={currentPage === 1}
-          className={`px-4 py-2 rounded-lg mx-2 ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-500 text-white'}`}
-        >
-          Prev
-        </button>
-        <span className={`text-lg ${darkMode ? 'text-white' : 'text-black'}`}>{currentPage} / {totalPages}</span>
-        <button
-          onClick={() => goToPage(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className={`px-4 py-2 rounded-lg mx-2 ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-500 text-white'}`}
-        >
-          Next
-        </button>
-      </div>
-      {isModalOpen && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
-    <div className={`p-6 rounded-lg w-96 transform transition-all duration-300 ease-in-out ${
-      isModalOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
-    } ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
-      <h2 className="text-2xl font-bold mb-4">Select Days for Meal Plan</h2>
-      <div className="grid grid-cols-2 gap-4">
-        {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
+        )}
+  
+        {/* Pagination */}
+        <div className="flex justify-center items-center gap-4 mt-8">
           <button
-            key={day}
-            onClick={() => handleDaySelection(day)}
-            className={`w-full py-2 text-lg rounded-lg transform transition-all duration-200 hover:scale-105 ${
-              selectedDays.includes(day)
-                ? "bg-blue-500 text-white shadow-lg"
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={`px-6 py-2.5 rounded-lg transition-colors font-medium ${
+              currentPage === 1
+                ? 'bg-gray-300 cursor-not-allowed'
                 : darkMode
-                ? "bg-gray-700 hover:bg-gray-600"
-                : "bg-gray-200 hover:bg-gray-300"
+                ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-200'
             }`}
           >
-            {day}
+            Previous
           </button>
-        ))}
+          <span className={`text-lg font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={`px-6 py-2.5 rounded-lg transition-colors font-medium ${
+              currentPage === totalPages
+                ? 'bg-gray-300 cursor-not-allowed'
+                : darkMode
+                ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-200'
+            }`}
+          >
+            Next
+          </button>
+        </div>
+  
+        {/* Meal Plan Modal */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
+            <div className={`p-6 rounded-lg w-96 transform transition-all duration-300 ease-in-out ${isModalOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'} ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
+              <h2 className="text-2xl font-bold mb-4">Select Days for Meal Plan</h2>
+              <div className="grid grid-cols-2 gap-4">
+                {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
+                  <button
+                    key={day}
+                    onClick={() => handleDaySelection(day)}
+                    className={`w-full py-2 text-lg rounded-lg transform transition-all duration-200 hover:scale-105 ${
+                      selectedDays.includes(day)
+                        ? "bg-blue-500 text-white shadow-lg"
+                        : darkMode
+                        ? "bg-gray-700 hover:bg-gray-600"
+                        : "bg-gray-200 hover:bg-gray-300"
+                    }`}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-4">
+                <select
+                  className={`p-2 border rounded w-full transition-colors duration-200 ${
+                    darkMode 
+                      ? 'bg-gray-700 border-gray-600 focus:border-blue-500' 
+                      : 'bg-gray-50 border-gray-300 focus:border-blue-500'
+                  }`}
+                  value={mealType}
+                  onChange={(e) => setMealType(e.target.value)}
+                >
+                  <option value="breakfast">Breakfast</option>
+                  <option value="lunch">Lunch</option>
+                  <option value="dinner">Dinner</option>
+                </select>
+              </div>
+              <div className="mt-4 flex justify-between">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="bg-gray-500 text-white px-4 py-2 rounded transform transition-all duration-200 hover:scale-105 hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveMealPlan}
+                  className="bg-green-500 text-white px-4 py-2 rounded transform transition-all duration-200 hover:scale-105 hover:bg-green-600"
+                >
+                  Save Meal Plan
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-      <div className="mt-4">
-        <select
-          className={`p-2 border rounded w-full transition-colors duration-200 ${
-            darkMode 
-              ? 'bg-gray-700 border-gray-600 focus:border-blue-500' 
-              : 'bg-gray-50 border-gray-300 focus:border-blue-500'
-          }`}
-          value={mealType}
-          onChange={(e) => setMealType(e.target.value)}
-        >
-          <option value="breakfast">Breakfast</option>
-          <option value="lunch">Lunch</option>
-          <option value="dinner">Dinner</option>
-        </select>
-      </div>
-      <div className="mt-4 flex justify-between">
-        <button
-          onClick={() => setIsModalOpen(false)}
-          className="bg-gray-500 text-white px-4 py-2 rounded transform transition-all duration-200 hover:scale-105 hover:bg-gray-600"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={saveMealPlan}
-          className="bg-green-500 text-white px-4 py-2 rounded transform transition-all duration-200 hover:scale-105 hover:bg-green-600"
-        >
-          Save Meal Plan
-        </button>
-      </div>
-    </div>
-  </div>
-)}
     </div>
   );
-}
+} 

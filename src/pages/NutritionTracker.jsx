@@ -13,7 +13,7 @@ import {
 import { PlusCircle, Trash2 } from "lucide-react";
 import { useTheme } from '../contexts/ThemeContext';
 import axios from 'axios';
-
+import { LineChart, Line, AreaChart, Area, RadialBarChart , RadialBar, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 export default function NutritionTracker() {
   const { user } = useAuth();
   const [loggedMeals, setLoggedMeals] = useState([]);
@@ -166,6 +166,36 @@ export default function NutritionTracker() {
     }
   };
 
+  const prepareChartData = () => {
+    return loggedMeals.map(meal => ({
+      name: meal.name,
+      calories: parseFloat(meal.calories),
+      protein: parseFloat(meal.protein),
+      carbs: parseFloat(meal.carbs),
+      fat: parseFloat(meal.fat)
+    }));
+  };
+
+  const prepareMacroData = () => {
+    return [
+      {
+        name: 'Protein',
+        value: totalProtein,
+        fill: '#0088FE'
+      },
+      {
+        name: 'Carbs',
+        value: totalCarbs,
+        fill: '#00C49F'
+      },
+      {
+        name: 'Fat',
+        value: totalFat,
+        fill: '#FFBB28'
+      }
+    ];
+  };
+
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -223,6 +253,7 @@ export default function NutritionTracker() {
           </div>
         </div>
 
+        
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -234,27 +265,92 @@ export default function NutritionTracker() {
           </div>
         ) : (
           <>
-            <div className="space-y-6">
-              {loggedMeals.map((meal) => (
-                <div
-                  key={meal.id}
-                  className={`flex justify-between items-center rounded-xl shadow-md p-6 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}
-                >
-                  <div>
-                    <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>{meal.name}</h3>
-                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{meal.calories} Calories</p>
-                  </div>
-                  <div>
-                    <button
-                      onClick={() => handleDeleteMeal(meal.id)}
-                      className="text-red-500 hover:text-red-600"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </div>
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              {/* Calorie Trend Chart */}
+              <div className={`rounded-xl shadow-md p-6 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                <h3 className="text-xl font-bold mb-4">Calorie Intake Trend</h3>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={prepareChartData()}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#374151' : '#e5e7eb'} />
+                      <XAxis dataKey="name" stroke={darkMode ? '#9CA3AF' : '#4B5563'} />
+                      <YAxis stroke={darkMode ? '#9CA3AF' : '#4B5563'} />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: darkMode ? '#1F2937' : '#FFFFFF',
+                          border: 'none',
+                          borderRadius: '8px',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                        }}
+                      />
+                      <Legend />
+                      <Line type="monotone" dataKey="calories" stroke="#3B82F6" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
                 </div>
-              ))}
+              </div>
+
+              {/* Macronutrient Distribution Chart */}
+              <div className={`rounded-xl shadow-md p-6 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                <h3 className="text-xl font-bold mb-4">Macronutrient Distribution</h3>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadialBarChart 
+                      innerRadius="30%" 
+                      outerRadius="100%" 
+                      data={prepareMacroData()} 
+                      startAngle={180} 
+                      endAngle={0}
+                    >
+                      <RadialBar
+                        minAngle={15}
+                        background
+                        clockWise={true}
+                        dataKey="value"
+                        cornerRadius={10}
+                      />
+                      <Legend 
+                        iconSize={10}
+                        layout="vertical"
+                        verticalAlign="middle"
+                        align="right"
+                      />
+                      <Tooltip />
+                    </RadialBarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Nutrient Breakdown Area Chart */}
+              <div className={`rounded-xl shadow-md p-6 lg:col-span-2 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                <h3 className="text-xl font-bold mb-4">Nutrient Breakdown</h3>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={prepareChartData()}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#374151' : '#e5e7eb'} />
+                      <XAxis dataKey="name" stroke={darkMode ? '#9CA3AF' : '#4B5563'} />
+                      <YAxis stroke={darkMode ? '#9CA3AF' : '#4B5563'} />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: darkMode ? '#1F2937' : '#FFFFFF',
+                          border: 'none',
+                          borderRadius: '8px',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                        }}
+                      />
+                      <Legend />
+                      <Area type="monotone" dataKey="protein" stackId="1" stroke="#0088FE" fill="#0088FE" fillOpacity={0.6} />
+                      <Area type="monotone" dataKey="carbs" stackId="1" stroke="#00C49F" fill="#00C49F" fillOpacity={0.6} />
+                      <Area type="monotone" dataKey="fat" stackId="1" stroke="#FFBB28" fill="#FFBB28" fillOpacity={0.6} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
             </div>
+
+           
+
 
             <div className={`mt-8 rounded-xl shadow-md p-6 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
               <h3 className="text-xl font-bold">Daily Nutritional Summary</h3>

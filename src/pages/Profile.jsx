@@ -73,6 +73,7 @@ export default function Profile() {
               <option value="vegetarian">Vegetarian</option>
               <option value="vegan">Vegan</option>
               <option value="gluten-free">Gluten-free</option>
+              <option value="Non-Veg">Non-Veg</option>
             </select>
           </div>
           <div>
