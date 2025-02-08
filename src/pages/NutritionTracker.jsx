@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { useTheme } from '../contexts/ThemeContext';
+import axios from 'axios';
 
 export default function NutritionTracker() {
   const { user } = useAuth();
@@ -28,6 +29,7 @@ export default function NutritionTracker() {
   const [totalFat, setTotalFat] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const { darkMode } = useTheme();
 
   useEffect(() => {
@@ -125,6 +127,40 @@ export default function NutritionTracker() {
     }
   };
 
+  // Fetch nutrition info from API
+  const fetchNutritionInfo = async (foodInput) => {
+    setGenerating(true);
+    try {
+      const apiKey = "1+Z7o7eAPhjxxYwGH8i3rg==yEKe8xemDLbuiwFn"; // **REPLACE WITH YOUR ACTUAL API KEY**
+      const apiUrl = `https://api.calorieninjas.com/v1/nutrition?query=${foodInput}`;
+
+      const response = await axios.get(apiUrl, {
+        headers: {
+          "X-Api-Key": apiKey,
+        },
+      });
+
+      if (response.data.items && response.data.items.length > 0) {
+        const foodData = response.data.items[0];
+        setNewMeal({
+          ...newMeal,
+          name: foodInput,
+          calories: foodData.calories,
+          carbs: foodData.carbohydrates_total_g,
+          protein: foodData.protein_g,
+          fat: foodData.fat_total_g,
+        });
+      } else {
+        alert("No nutrition information found for that food.");
+      }
+    } catch (err) {
+      console.error("Error fetching nutrition data:", err);
+      alert("Error fetching data. Please try again.");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -136,45 +172,42 @@ export default function NutritionTracker() {
               placeholder="Meal Name"
               className={`w-full p-3 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'} rounded-lg focus:ring-2 focus:ring-blue-500`}
               value={newMeal.name}
-              onChange={(e) =>
-                setNewMeal({ ...newMeal, name: e.target.value })
-              }
+              onChange={(e) => setNewMeal({ ...newMeal, name: e.target.value })}
             />
+            <button
+              onClick={() => fetchNutritionInfo(newMeal.name)}
+              className="w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
+              disabled={generating}
+            >
+              {generating ? "Fetching..." : "Get Nutrition Info"}
+            </button>
             <input
               type="number"
               placeholder="Calories"
               className={`w-full p-3 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'} rounded-lg focus:ring-2 focus:ring-blue-500`}
               value={newMeal.calories}
-              onChange={(e) =>
-                setNewMeal({ ...newMeal, calories: e.target.value })
-              }
+              onChange={(e) => setNewMeal({ ...newMeal, calories: e.target.value })}
             />
             <input
               type="number"
               placeholder="Carbs (g)"
               className={`w-full p-3 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'} rounded-lg focus:ring-2 focus:ring-blue-500`}
               value={newMeal.carbs}
-              onChange={(e) =>
-                setNewMeal({ ...newMeal, carbs: e.target.value })
-              }
+              onChange={(e) => setNewMeal({ ...newMeal, carbs: e.target.value })}
             />
             <input
               type="number"
               placeholder="Protein (g)"
               className={`w-full p-3 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'} rounded-lg focus:ring-2 focus:ring-blue-500`}
               value={newMeal.protein}
-              onChange={(e) =>
-                setNewMeal({ ...newMeal, protein: e.target.value })
-              }
+              onChange={(e) => setNewMeal({ ...newMeal, protein: e.target.value })}
             />
             <input
               type="number"
               placeholder="Fat (g)"
               className={`w-full p-3 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'} rounded-lg focus:ring-2 focus:ring-blue-500`}
               value={newMeal.fat}
-              onChange={(e) =>
-                setNewMeal({ ...newMeal, fat: e.target.value })
-              }
+              onChange={(e) => setNewMeal({ ...newMeal, fat: e.target.value })}
             />
             <button
               onClick={handleAddMeal}

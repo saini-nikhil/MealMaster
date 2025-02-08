@@ -17,7 +17,9 @@ import FavRecipes from './pages/MyFavRecipes';
 import Community from './pages/Community';
 
 function App() {
-  return (
+  return ( 
+
+    
     <AuthProvider>
       <ThemeProvider>
         <BrowserRouter>
