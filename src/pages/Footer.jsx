@@ -18,9 +18,9 @@ const Footer = () => {
   ];
 
   const quickLinks = [
-    { name: 'Weekly Meal Plans', path: '/meal-planner/weekly', icon: Clock },
-    { name: 'Featured Recipes', path: '/recipes/featured', icon: Trophy },
-    { name: 'Community Success Stories', path: '/community/success', icon: Users }
+    { name: 'Weekly Meal Plans', path: '/meal-planner', icon: Clock },
+    { name: 'Favorite Recipes', path: '/favrecipes', icon: Trophy },
+    { name: 'Community Recipe Stories', path: '/community', icon: Users }
   ];
   const { darkMode } = useTheme();
   return (

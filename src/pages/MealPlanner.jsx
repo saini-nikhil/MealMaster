@@ -211,24 +211,7 @@ const MealPlanner = () => {
         </div>
       </div>
 
-      {/* Week Navigation */}
-      <div className="flex justify-between items-center mb-6">
-        <button
-          onClick={() => navigateWeek(-1)}
-          className={`p-2 rounded-full ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'} transition-colors`}
-        >
-          <ChevronLeft />
-        </button>
-        <h2 className="text-xl font-semibold">
-          Week of {currentWeekStart.toLocaleDateString()}
-        </h2>
-        <button
-          onClick={() => navigateWeek(1)}
-          className={`p-2 rounded-full ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'} transition-colors`}
-        >
-          <ChevronRight />
-        </button>
-      </div>
+      
 
       {/* Weekly Calendar Grid */}
       <div className="grid grid-cols-1 md:grid-cols-7 gap-4 mb-8">
