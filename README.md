@@ -50,6 +50,8 @@ Provide instructions and examples on how to use your project.
 
 ## Credentials
 Provide user credentials for authenticated pages.
+Email - nikhil1@gmail.com
+Password = 12345@
 
 ## APIs Used
 - **Gemini AI** - For meal assistant and grocery list generation
