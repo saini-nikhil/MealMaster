@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Plus, X, ChevronLeft, ChevronRight, Trash2, Tag } from 'lucide-react';
+import { Calendar, Plus, X, Tag, ShoppingCart, Trash2 } from 'lucide-react';
 import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../Auth/firebase';
 import { useAuth } from '../Auth/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';  // Import the useTheme hook
-import { motion } from 'framer-motion';
-
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';  // Add this line
 
 const categories = ['all', 'vegetarian', 'vegan', 'non-vegetarian', 'gluten-free'];
 
 const MealPlanner = () => {
   const { user } = useAuth();
-  const { darkMode } = useTheme();  // Use the theme context
+  const { darkMode } = useTheme();
+  const navigate = useNavigate();
   const [favRecipes, setFavRecipes] = useState([]);
   const [mealPlans, setMealPlans] = useState([]);
   const [isAddingMeal, setIsAddingMeal] = useState(false);
@@ -22,13 +23,13 @@ const MealPlanner = () => {
   const [currentWeekStart, setCurrentWeekStart] = useState(getWeekStart());
   const [draggedRecipe, setDraggedRecipe] = useState(null);
   const [dropTarget, setDropTarget] = useState({ day: null, mealType: null });
+  const [hoveredRecipe, setHoveredRecipe] = useState(null);
 
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const mealTypes = ['breakfast', 'lunch', 'dinner'];
-  
+
   useEffect(() => {
     if (user) {
-      // Fetch favorite recipes
       const recipesQuery = query(
         collection(db, 'userRecipes'),
         where('userId', '==', user.uid)
@@ -42,7 +43,6 @@ const MealPlanner = () => {
         setFavRecipes(recipes);
       });
 
-      // Fetch meal plans
       const mealPlansQuery = query(
         collection(db, 'mealPlans'),
         where('userId', '==', user.uid)
@@ -138,11 +138,68 @@ const MealPlanner = () => {
     );
   };
 
+  const handleGenerateGroceryList = (recipe) => {
+    navigate('/grocerylist', { state: { recipe: recipe.name } });
+  };
+
   const navigateWeek = (direction) => {
     const newDate = new Date(currentWeekStart);
     newDate.setDate(newDate.getDate() + (direction * 7));
     setCurrentWeekStart(newDate);
   };
+
+  const renderFavoriteRecipes = () => (
+    <div className="mb-8">
+      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+        <Tag className="w-5 h-5" />
+        Favorite Recipes
+      </h2>
+      <div className="flex flex-wrap gap-3">
+        {favRecipes.map((recipe) => (
+          <motion.div
+            key={recipe.id}
+            className="relative"
+            onMouseEnter={() => setHoveredRecipe(recipe.id)}
+            onMouseLeave={() => setHoveredRecipe(null)}
+          >
+            <motion.div
+              draggable
+              onDragStart={() => handleDragStart(recipe)}
+              className={`${getCategoryColor(recipe.category)} text-white px-4 py-2 rounded-lg cursor-move 
+                flex items-center gap-2 relative`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <span>{recipe.name}</span>
+            </motion.div>
+            
+            {/* Grocery List Button - Shows on Hover */}
+            <AnimatePresence>
+              {hoveredRecipe === recipe.id && (
+                <motion.button
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute -bottom-8 left-0 right-0 bg-green-500 text-white px-2 py-1 rounded-md 
+                    text-sm flex items-center justify-center gap-1 hover:bg-green-600 transition-colors shadow-lg"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleGenerateGroceryList(recipe);
+                  }}
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  Generate List
+                </motion.button>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className={`max-w-7xl mx-auto p-6 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
@@ -160,34 +217,6 @@ const MealPlanner = () => {
           Add Meal
         </button>
       </div>
-
-      {/* Favorite Recipes Tags Section */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <Tag className="w-5 h-5" />
-          Favorite Recipes
-        </h2>
-        <div className="flex flex-wrap gap-3">
-          {favRecipes.map((recipe) => (
-            <motion.div
-              key={recipe.id}
-              draggable
-              onDragStart={() => handleDragStart(recipe)}
-              className={`${getCategoryColor(recipe.category)} text-white px-4 py-2 rounded-lg cursor-move 
-                flex items-center gap-2`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <span>{recipe.name}</span>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      
 
       {/* Weekly Calendar Grid */}
       <div className="grid grid-cols-1 md:grid-cols-7 gap-4 mb-8">
@@ -257,9 +286,7 @@ const MealPlanner = () => {
                 <select
                   value={selectedDay}
                   onChange={(e) => setSelectedDay(e.target.value)}
-                  className={`w-full p-2 rounded-lg ${
-                    darkMode ? 'bg-gray-700' : 'bg-gray-50'
-                  }`}
+                  className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}
                 >
                   <option value="">Select Day</option>
                   {days.map((day) => (
@@ -273,9 +300,7 @@ const MealPlanner = () => {
                 <select
                   value={selectedMealType}
                   onChange={(e) => setSelectedMealType(e.target.value)}
-                  className={`w-full p-2 rounded-lg ${
-                    darkMode ? 'bg-gray-700' : 'bg-gray-50'
-                  }`}
+                  className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}
                 >
                   {mealTypes.map((type) => (
                     <option key={type} value={type}>
@@ -291,9 +316,7 @@ const MealPlanner = () => {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className={`w-full p-2 rounded-lg ${
-                  darkMode ? 'bg-gray-700' : 'bg-gray-50'
-                }`}
+                className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}
               >
                 {categories.map((category) => (
                   <option key={category} value={category}>
@@ -310,10 +333,9 @@ const MealPlanner = () => {
                   <button
                     key={recipe.id}
                     onClick={() => setSelectedRecipe(recipe)}
-                    className={`p-3 rounded-lg text-left transition-colors ${
-                      selectedRecipe?.id === recipe.id
-                        ? getCategoryColor(recipe.category) + ' text-white'
-                        : darkMode
+                    className={`p-3 rounded-lg text-left transition-colors ${selectedRecipe?.id === recipe.id
+                      ? getCategoryColor(recipe.category) + ' text-white'
+                      : darkMode
                         ? 'bg-gray-700 hover:bg-gray-600'
                         : 'bg-gray-50 hover:bg-gray-100'
                     }`}
@@ -328,25 +350,24 @@ const MealPlanner = () => {
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setIsAddingMeal(false)}
-                className={`px-4 py-2 rounded-lg ${
-                  darkMode ? 'bg-gray-700' : 'bg-gray-200'
-                } hover:opacity-80 transition-opacity`}
+                className={`px-4 py-2 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-200'} hover:opacity-80 transition-opacity`}
               >
                 Cancel
               </button>
               <button
                 onClick={addMealPlan}
                 disabled={!selectedDay || !selectedRecipe}
-                className={`px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors ${
-                  (!selectedDay || !selectedRecipe) && 'opacity-50 cursor-not-allowed'
-                }`}
+                className={`px-4 py-2 rounded-lg ${!selectedDay || !selectedRecipe ? 'bg-gray-400' : 'bg-blue-600'} 
+                text-white hover:bg-blue-700 transition-colors`}
               >
-                Add to Plan
+                Add Meal
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {renderFavoriteRecipes()}
     </div>
   );
 };

@@ -16,6 +16,7 @@ import Homepage from './pages/Homepage';
 import FavRecipes from './pages/MyFavRecipes';
 import Community from './pages/Community';
 import ChatInterface from './pages/ChatInterface';
+import GroceryList from './pages/GroceryList';
 
 function App() {
   return ( 
@@ -64,6 +65,11 @@ function App() {
                 <Route path="/ChatInterface" element={
                   <ProtectedRoute>
                     <ChatInterface />
+                  </ProtectedRoute>
+                } />
+                <Route path="/grocerylist" element={
+                  <ProtectedRoute>
+                    <GroceryList />
                   </ProtectedRoute>
                 } />
               </Routes>
