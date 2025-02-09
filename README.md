@@ -1,8 +1,63 @@
-# React + Vite
+# MealMaster App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Introduction
+MealMaster is a meal planning application designed to help users create meal plans, track nutrition, and promote healthy eating habits. It offers personalized meal plans based on dietary preferences and goals, making it easier to maintain a balanced diet.
 
-Currently, two official plugins are available:
+## Project Type
+Frontend
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Deployed App
+Frontend: [Insert Deployed URL]
+
+## Directory Structure
+```
+my-app/
+├─ src/
+│  ├─ aiikey/
+│  ├─ auth/
+│  ├─ context/
+│  ├─ assets/
+│  ├─ pages/
+```
+
+## Video Walkthrough of the project
+Attach a very short video walkthrough of all of the features [1 - 3 minutes]
+
+## Video Walkthrough of the codebase
+Attach a very short video walkthrough of the codebase [1 - 5 minutes]
+
+## Features
+- User authentication using Firebase
+- Meal plan creation with dietary preferences
+- Recipe database with nutritional insights
+- Grocery list generator
+- Meal prep reminders
+- Calorie and macronutrient tracking
+
+## Design Decisions & Assumptions
+- Firebase used for authentication and database management
+- Simple and user-friendly UI to enhance user experience
+- Focus on nutrition tracking and meal planning efficiency
+
+## Installation & Getting Started
+```bash
+npm install
+npm start
+```
+
+## Usage
+Provide instructions and examples on how to use your project.
+
+## Credentials
+Provide user credentials for authenticated pages.
+
+## APIs Used
+- Firebase Authentication
+- Firebase Firestore for storing user data
+
+## Technology Stack
+- React.js
+- Firebase Authentication
+- Firebase Firestore
+- Tailwind CSS
+- Context API for state management
