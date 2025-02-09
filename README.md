@@ -7,7 +7,8 @@ MealMaster is a meal planning application designed to help users create meal pla
 Frontend
 
 ## Deployed App
-Frontend: [Insert Deployed URL]
+Frontend: [https://mealmaster01.vercel.app/]
+[https://mealmaster01.netlify.app/]
 
 ## Directory Structure
 ```
@@ -21,10 +22,8 @@ my-app/
 ```
 
 ## Video Walkthrough of the project
-Attach a very short video walkthrough of all of the features [1 - 3 minutes]
+Attach a very short video walkthrough of all of the features [https://www.youtube.com/watch?v=W6VqDtofj-k]
 
-## Video Walkthrough of the codebase
-Attach a very short video walkthrough of the codebase [1 - 5 minutes]
 
 ## Features
 - User authentication using Firebase
@@ -41,8 +40,9 @@ Attach a very short video walkthrough of the codebase [1 - 5 minutes]
 
 ## Installation & Getting Started
 ```bash
+git clone
 npm install
-npm start
+npm run dev
 ```
 
 ## Usage
@@ -52,8 +52,10 @@ Provide instructions and examples on how to use your project.
 Provide user credentials for authenticated pages.
 
 ## APIs Used
-- Firebase Authentication
-- Firebase Firestore for storing user data
+- **Gemini AI** - For meal assistant and grocery list generation
+- **CalorieNinja** - For fetching nutritional values
+- **Firebase Authentication** - For user authentication
+- **Firebase Firestore** - For storing user data
 
 ## Technology Stack
 - React.js
