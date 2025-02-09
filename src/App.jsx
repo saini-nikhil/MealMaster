@@ -17,6 +17,7 @@ import FavRecipes from './pages/MyFavRecipes';
 import Community from './pages/Community';
 import ChatInterface from './pages/ChatInterface';
 import GroceryList from './pages/GroceryList';
+import AiRecipegenrater from './pages/AiRecipegenrater';
 
 function App() {
   return ( 
@@ -70,6 +71,11 @@ function App() {
                 <Route path="/grocerylist" element={
                   <ProtectedRoute>
                     <GroceryList />
+                  </ProtectedRoute>
+                } />
+                <Route path="/AiRecipegenrater" element={
+                  <ProtectedRoute>
+                    <AiRecipegenrater />
                   </ProtectedRoute>
                 } />
               </Routes>

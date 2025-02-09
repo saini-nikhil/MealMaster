@@ -22,7 +22,7 @@ const GroceryList = () => {
     }
   }, [location.state]);
 
-  const API_KEY = "AIzaSyDtt9iTVZyMWurYKixqAO4CdfzGNFF3N2g"; // Ensure you use the correct API key
+  const API_KEY = "AIzaSyDtt9iTVZyMWurYKixqAO4CdfzGNFF3N2g"; 
 
   const recipeTags = [
     { id: 'vegetarian', label: 'Vegetarian', icon: '🥬', recipes: ['Spinach and Ricotta Lasagna', 'Mushroom Risotto', 'Eggplant Parmesan', 'Vegetable Curry', 'Black Bean Burgers'] },

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Auth/AuthContext';
 import { Link } from 'react-router-dom';
-import { Calendar, BookOpen, Flame } from 'lucide-react';
+import { Calendar, BookOpen, Flame ,Bot  } from 'lucide-react';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import { Bar, Pie } from 'react-chartjs-2';
 import { db } from "../Auth/firebase";
@@ -175,10 +175,9 @@ export default function Dashboard() {
     minHeight: '400px', // Gives charts a good height
   };
 
-  
   return (
     <div className={`p-4 min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
-      <h1 className="text-3xl font-bold mb-8">Welcome, {user?.username || "User"}!</h1>
+      <h1 className="text-3xl font-bold mb-8">Welcome, {user?.displayName || "User"}!</h1>
       
       {/* Quick Links Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -195,6 +194,13 @@ export default function Dashboard() {
             <BookOpen className="w-12 h-12 mb-4 text-green-500" />
             <h2 className="text-xl font-bold mb-2">Recipe Database</h2>
             <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} text-center`}>Browse and search recipes</p>
+          </Link>
+        </div>
+        <div className={`p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+          <Link to="/AiRecipegenrater" className="flex flex-col items-center">
+          <Bot className="w-12 h-12 mb-4 text-red-500" />  {/* Replace with your actual logo */}
+            <h2 className="text-xl font-bold mb-2">Ai Recipe Database</h2>
+            <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} text-center`}>Browse and search recipes using AI</p>
           </Link>
         </div>
       </div>

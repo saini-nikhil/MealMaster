@@ -13,8 +13,7 @@ export default function ChatInterface() {
   const messagesEndRef = useRef(null);
   const { darkMode } = useTheme();
   
-  const apiKey = "AIzaSyDtt9iTVZyMWurYKixqAO4CdfzGNFF3N2g"; // Replace with your actual API key
-
+  const apiKey = "AIzaSyDtt9iTVZyMWurYKixqAO4CdfzGNFF3N2g"; 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
