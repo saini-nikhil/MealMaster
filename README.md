@@ -4,7 +4,7 @@
 MealMaster is a meal planning application designed to help users create meal plans, track nutrition, and promote healthy eating habits. It offers personalized meal plans based on dietary preferences and goals, making it easier to maintain a balanced diet.
 
 ## Project Type
-Frontend
+Full Stack 
 
 ## Deployed App
 Frontend: [https://mealmaster01.vercel.app/]
