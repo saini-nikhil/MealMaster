@@ -22,7 +22,7 @@ my-app/
 ```
 
 ## Video Walkthrough of the project
-Attach a very short video walkthrough of all of the features [https://www.youtube.com/watch?v=W6VqDtofj-k]
+A short video walkthrough of all of the features [https://www.youtube.com/watch?v=W6VqDtofj-k]
 
 
 ## Features
