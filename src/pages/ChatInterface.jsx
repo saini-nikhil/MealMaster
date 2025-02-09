@@ -3,6 +3,7 @@ import { Send, Loader2, Bot, User, RefreshCw } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
+import { Key } from '../AiKey/Key';
 
 export default function ChatInterface() {
   const [messages, setMessages] = useState([
@@ -13,7 +14,7 @@ export default function ChatInterface() {
   const messagesEndRef = useRef(null);
   const { darkMode } = useTheme();
   
-  const apiKey = "AIzaSyDtt9iTVZyMWurYKixqAO4CdfzGNFF3N2g"; 
+  const apiKey = Key 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -84,6 +85,7 @@ Develop a Meal Planning App that allows users to create meal plans, track their 
   };
 
   return (
+    <div className={`${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
     <div className={`flex flex-col h-[600px] w-full max-w-2xl mx-auto rounded-xl shadow-lg overflow-hidden ${
       darkMode ? 'bg-gray-800' : 'bg-white'
     }`}>
@@ -193,6 +195,7 @@ Develop a Meal Planning App that allows users to create meal plans, track their 
           </button>
         </div>
       </form>
+    </div>
     </div>
   );
 }

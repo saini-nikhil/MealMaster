@@ -3,6 +3,8 @@ import { MessageCircle, ShoppingCart, ChevronRight, Loader2, Download, Printer, 
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2pdf from 'html2pdf.js';
+import { Key } from '../AiKey/Key';
+import { useTheme } from '../contexts/ThemeContext';
 
 const GroceryList = () => {
   const [message, setMessage] = useState('');
@@ -14,6 +16,7 @@ const GroceryList = () => {
   const [showExportOptions, setShowExportOptions] = useState(false);
   const groceryListRef = useRef(null);
   const location = useLocation();
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     if (location.state?.recipe) {
@@ -22,7 +25,7 @@ const GroceryList = () => {
     }
   }, [location.state]);
 
-  const API_KEY = "AIzaSyDtt9iTVZyMWurYKixqAO4CdfzGNFF3N2g"; 
+  const API_KEY = Key
 
   const recipeTags = [
     { id: 'vegetarian', label: 'Vegetarian', icon: '🥬', recipes: ['Spinach and Ricotta Lasagna', 'Mushroom Risotto', 'Eggplant Parmesan', 'Vegetable Curry', 'Black Bean Burgers'] },
@@ -143,7 +146,11 @@ const GroceryList = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
+    <div className={`${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+    <div className={`max-w-4xl mx-auto p-6 space-y-8 ${
+      darkMode ? 'bg-gray-800 text-white' : 'bg-gray-50'
+    }`}>
+      {/* Recipe Tags */}
       <div className="flex gap-4 overflow-x-auto pb-4">
         {recipeTags.map((tag) => (
           <motion.button
@@ -154,7 +161,9 @@ const GroceryList = () => {
             className={`px-4 py-2 rounded-full flex items-center gap-2 ${
               selectedTag === tag.id
                 ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 hover:bg-gray-200'
+                : darkMode 
+                  ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
+                  : 'bg-gray-100 hover:bg-gray-200'
             }`}
           >
             <span>{tag.icon}</span>
@@ -163,21 +172,28 @@ const GroceryList = () => {
         ))}
       </div>
 
+      {/* Recipe Selection Modal */}
       <AnimatePresence>
         {showRecipes && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="bg-white rounded-lg shadow-lg p-6 relative"
+            className={`rounded-lg shadow-lg p-6 relative ${
+              darkMode ? 'bg-gray-800' : 'bg-white'
+            }`}
           >
             <button
               onClick={() => setShowRecipes(false)}
-              className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
+              className={`absolute right-4 top-4 ${
+                darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
+              }`}
             >
               <X className="w-5 h-5" />
             </button>
-            <h3 className="text-xl font-semibold mb-4">
+            <h3 className={`text-xl font-semibold mb-4 ${
+              darkMode ? 'text-white' : 'text-gray-900'
+            }`}>
               {recipeTags.find(tag => tag.id === selectedTag)?.label} Recipes
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -189,7 +205,11 @@ const GroceryList = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleRecipeClick(recipe)}
-                    className="p-4 bg-gray-50 rounded-lg text-left hover:bg-gray-100 transition-colors"
+                    className={`p-4 rounded-lg text-left transition-colors ${
+                      darkMode
+                        ? 'bg-gray-700 hover:bg-gray-600'
+                        : 'bg-gray-50 hover:bg-gray-100'
+                    }`}
                   >
                     {recipe}
                   </motion.button>
@@ -199,12 +219,18 @@ const GroceryList = () => {
         )}
       </AnimatePresence>
 
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+      {/* Main Content */}
+      <div className={`rounded-lg shadow-lg p-6 ${
+        darkMode ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <h2 className={`text-2xl font-bold mb-6 flex items-center gap-2 ${
+          darkMode ? 'text-white' : 'text-gray-900'
+        }`}>
           <MessageCircle className="w-6 h-6" />
           Recipe Assistant
         </h2>
 
+        {/* Input Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="relative">
             <input
@@ -212,7 +238,11 @@ const GroceryList = () => {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Enter your recipe or meal plan..."
-              className="w-full p-4 pr-12 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full p-4 pr-12 rounded-lg border ${
+                darkMode 
+                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             />
             <button
               type="submit"
@@ -231,9 +261,12 @@ const GroceryList = () => {
 
         {error && <p className="text-red-500 mt-4">{error}</p>}
 
+        {/* Grocery List */}
         <div className="mt-8" ref={groceryListRef} id="groceryListRef">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-semibold flex items-center gap-2">
+            <h3 className={`text-xl font-semibold flex items-center gap-2 ${
+              darkMode ? 'text-white' : 'text-gray-900'
+            }`}>
               <ShoppingCart className="w-5 h-5" />
               Your Grocery List
             </h3>
@@ -256,22 +289,30 @@ const GroceryList = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-2 bg-white shadow-lg rounded-lg overflow-hidden z-10"
+                      className={`absolute right-0 mt-2 shadow-lg rounded-lg overflow-hidden z-10 ${
+                        darkMode ? 'bg-gray-700' : 'bg-white'
+                      }`}
                     >
                       <motion.button
-                        whileHover={{ backgroundColor: 'rgb(243, 244, 246)' }}
-                        className="w-full px-4 py-2 text-left flex items-center gap-2 hover:bg-gray-100 transition-colors"
+                        whileHover={{ backgroundColor: darkMode ? 'rgb(55, 65, 81)' : 'rgb(243, 244, 246)' }}
+                        className={`w-full px-4 py-2 text-left flex items-center gap-2 transition-colors ${
+                          darkMode 
+                            ? 'text-white hover:bg-gray-600' 
+                            : 'text-gray-900 hover:bg-gray-100'
+                        }`}
                         onClick={handleDownloadPDF}
-                        style={{ backgroundColor: 'white' }}
                       >
                         <Download className="w-4 h-4" />
                         Download PDF
                       </motion.button>
                       <motion.button
-                        whileHover={{ backgroundColor: 'rgb(243, 244, 246)' }}
-                        className="w-full px-4 py-2 text-left flex items-center gap-2 hover:bg-gray-100 transition-colors"
+                        whileHover={{ backgroundColor: darkMode ? 'rgb(55, 65, 81)' : 'rgb(243, 244, 246)' }}
+                        className={`w-full px-4 py-2 text-left flex items-center gap-2 transition-colors ${
+                          darkMode 
+                            ? 'text-white hover:bg-gray-600' 
+                            : 'text-gray-900 hover:bg-gray-100'
+                        }`}
                         onClick={handlePrint}
-                        style={{ backgroundColor: 'white' }}
                       >
                         <Printer className="w-4 h-4" />
                         Print List
@@ -281,37 +322,52 @@ const GroceryList = () => {
                 </AnimatePresence>
               </div>
             )}
-
-            <style>{`
-  @media print {
-    body * {
-      visibility: hidden;
-    }
-    #groceryListRef, #groceryListRef * {
-      visibility: visible;
-      background-color: rgb(255, 255, 255) !important;
-      color: rgb(0, 0, 0) !important;
-    }
-    #groceryListRef {
-      position: absolute;
-      left: 0;
-      top: 0;
-    }
-  }
-`}</style>
           </div>
+
           <div className="mt-4 space-y-2">
             {groceryItems.map((item) => (
-              <div key={item.id} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+              <div 
+                key={item.id} 
+                className={`flex items-center gap-2 p-3 rounded-lg ${
+                  darkMode 
+                    ? 'bg-gray-700 text-white' 
+                    : 'bg-gray-50 text-gray-900'
+                }`}
+              >
                 <span>{item.icon}</span>
                 <span className="font-medium">{item.name}</span>
-                <span className="text-gray-500">- {item.quantity}</span>
-                <span className="ml-auto text-sm text-gray-400">{item.category}</span>
+                <span className={darkMode ? 'text-gray-300' : 'text-gray-500'}>
+                  - {item.quantity}
+                </span>
+                <span className={`ml-auto text-sm ${
+                  darkMode ? 'text-gray-400' : 'text-gray-400'
+                }`}>
+                  {item.category}
+                </span>
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          #groceryListRef, #groceryListRef * {
+            visibility: visible;
+            background-color: rgb(255, 255, 255) !important;
+            color: rgb(0, 0, 0) !important;
+          }
+          #groceryListRef {
+            position: absolute;
+            left: 0;
+            top: 0;
+          }
+        }
+      `}</style>
+    </div>
     </div>
   );
 };

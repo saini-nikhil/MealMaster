@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { MessageCircle, ShoppingCart, ChevronRight, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Key } from '../AiKey/Key';
+import { useTheme } from '../contexts/ThemeContext';
 
 const AiRecipegenrater = () => {
   const [message, setMessage] = useState('');
@@ -9,9 +11,10 @@ const AiRecipegenrater = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedTag, setSelectedTag] = useState('all');
   const [error, setError] = useState(null);
+  const { darkMode } = useTheme();
 
-  const API_KEY = "AIzaSyDtt9iTVZyMWurYKixqAO4CdfzGNFF3N2g"; // Use your API key here
-  
+  const API_KEY = Key
+
   const recipeTags = [
     { id: 'all', label: 'All Recipes', icon: '🍳' },
     { id: 'vegetarian', label: 'Vegetarian', icon: '🥬' },
@@ -106,7 +109,10 @@ const AiRecipegenrater = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
+    <div className={`${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+    <div className={`max-w-4xl mx-auto p-6 space-y-8 ${
+      darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50'
+    }`}>
       {/* Recipe Tags */}
       <div className="flex gap-4 overflow-x-auto pb-4">
         {recipeTags.map((tag) => (
@@ -115,10 +121,13 @@ const AiRecipegenrater = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setSelectedTag(tag.id)}
-            className={`px-4 py-2 rounded-full flex items-center gap-2 ${selectedTag === tag.id
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-100 hover:bg-gray-200'
-              }`}
+            className={`px-4 py-2 rounded-full flex items-center gap-2 ${
+              selectedTag === tag.id
+                ? 'bg-blue-500 text-white'
+                : darkMode 
+                  ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
+                  : 'bg-gray-100 hover:bg-gray-200'
+            }`}
           >
             <span>{tag.icon}</span>
             <span>{tag.label}</span>
@@ -127,8 +136,12 @@ const AiRecipegenrater = () => {
       </div>
 
       {/* Chat Interface */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+      <div className={`rounded-lg shadow-lg p-6 ${
+        darkMode ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <h2 className={`text-2xl font-bold mb-6 flex items-center gap-2 ${
+          darkMode ? 'text-white' : 'text-gray-900'
+        }`}>
           <MessageCircle className="w-6 h-6" />
           Recipe Assistant
         </h2>
@@ -140,7 +153,11 @@ const AiRecipegenrater = () => {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Enter your recipe or meal plan..."
-              className="w-full p-4 pr-12 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full p-4 pr-12 rounded-lg border ${
+                darkMode 
+                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             />
             <button
               type="submit"
@@ -157,14 +174,22 @@ const AiRecipegenrater = () => {
         {/* Recipe Instructions */}
         {recipe && (
           <div className="mt-8">
-            <h3 className="text-xl font-semibold mb-4">Recipe Instructions</h3>
-            <p className="text-gray-700">{recipe}</p>
+            <h3 className={`text-xl font-semibold mb-4 ${
+              darkMode ? 'text-white' : 'text-gray-900'
+            }`}>
+              Recipe Instructions
+            </h3>
+            <p className={
+              darkMode ? 'text-gray-300' : 'text-gray-700'
+            }>{recipe}</p>
           </div>
         )}
 
         {/* Grocery List */}
         <div className="mt-8">
-          <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <h3 className={`text-xl font-semibold mb-4 flex items-center gap-2 ${
+            darkMode ? 'text-white' : 'text-gray-900'
+          }`}>
             <ShoppingCart className="w-5 h-5" />
             Your Grocery List
           </h3>
@@ -182,16 +207,26 @@ const AiRecipegenrater = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    className="bg-gray-50 p-4 rounded-lg flex items-center justify-between"
+                    className={`p-4 rounded-lg flex items-center justify-between ${
+                      darkMode ? 'bg-gray-700' : 'bg-gray-50'
+                    }`}
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{item.icon}</span>
                       <div>
-                        <h4 className="font-medium">{item.name}</h4>
-                        <p className="text-sm text-gray-500">{item.category}</p>
+                        <h4 className={`font-medium ${
+                          darkMode ? 'text-white' : 'text-gray-900'
+                        }`}>{item.name}</h4>
+                        <p className={
+                          darkMode ? 'text-gray-400' : 'text-gray-500'
+                        }>{item.category}</p>
                       </div>
                     </div>
-                    <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                    <span className={`px-3 py-1 rounded-full text-sm ${
+                      darkMode 
+                        ? 'bg-blue-900/50 text-blue-200' 
+                        : 'bg-blue-100 text-blue-800'
+                    }`}>
                       {item.quantity}
                     </span>
                   </motion.div>
@@ -201,6 +236,7 @@ const AiRecipegenrater = () => {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 };

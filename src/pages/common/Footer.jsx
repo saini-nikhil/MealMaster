@@ -1,6 +1,6 @@
 import React from 'react';
 import { ExternalLink, ChevronRight, Heart, Clock, Trophy, Users } from 'lucide-react';
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const Footer = () => {
   const features = [
@@ -24,8 +24,8 @@ const Footer = () => {
   ];
   const { darkMode } = useTheme();
   return (
-    <div className={`${darkMode ? 'bg-gray-900' : 'bg-gradient-to-b from-blue-50 to-white'}`}>
-      <footer className={`${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg py-12`}>
+    <div className={` ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-b from-blue-50 to-white'}`}>
+      <footer className={`shadow-lg ${darkMode ? 'bg-gray-900' : 'bg-white'} shadow-lg py-12`}>
         <div className="max-w-6xl mx-auto px-8">
           <div className="grid md:grid-cols-3 gap-12 animate-fade-in">
             <div className="w-full">

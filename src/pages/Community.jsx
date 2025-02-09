@@ -245,6 +245,9 @@ export default function Community() {
   );
 
   return (
+    <div className={`${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+
+  
     <div className={`max-w-5xl mx-auto py-10 px-4 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <HeroSection />
       
@@ -455,6 +458,7 @@ export default function Community() {
           ))}
         </motion.div>
       )}
+    </div>
     </div>
   );
 }

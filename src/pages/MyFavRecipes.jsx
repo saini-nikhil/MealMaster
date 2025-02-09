@@ -25,10 +25,11 @@ export default function FavRecipes() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   
   const [mealType, setMealType] = useState("breakfast");
-  const [timerState, setTimerState] = useState({
+const [timerState, setTimerState] = useState({
     recipeId: null,
-    timerMinutes: 0,
+    timerMinutes: "",
     timeLeft: null,
+    isRunning: false
   });
 
   const alarmSound = new Audio("/alarm.mp3");
